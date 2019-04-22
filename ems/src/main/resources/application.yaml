@@ -1,0 +1,26 @@
+server:
+  port: 8989
+  jsp-servlet:
+    init-parameters:
+      development: true
+spring:
+  mvc:
+    view:
+      suffix: .jsp
+      prefix: /
+  datasource:
+    username: root
+    password: root
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://192.168.68.45:3306/ems2
+    driver-class-name: com.mysql.jdbc.Driver
+mybatis:
+  type-aliases-package: com.baizhi.entity
+  mapper-locations: com/baizhi/mapper/*.xml
+#分页插件相关参数
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
+
