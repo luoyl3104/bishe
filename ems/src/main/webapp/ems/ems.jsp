@@ -2,75 +2,75 @@
 <%@page pageEncoding="UTF-8" contentType="text/html; UTF-8" isELIgnored="false" %>
 <c:set var="app" value="${pageContext.request.contextPath}"/>
 <script>
-  $(function () {
-      //创建表格
-      $("#empTable").jqGrid({
-          styleUI : 'Bootstrap',
-          caption:"员工信息表",
-          autowidth:true,
-          url:"",
-          datatype:"json",
-          rowNum:2,
-          pager:"#pager",
-          viewrecords:true,
-          editurl:"",
-          colNames:["id","姓名","年龄","生日","操作"],
-          colModel:[
-              {name:"id"},
-              {name:"name",editable:true},
-              {name:"age",editable:true},
-              {name:"bir",editable:true},
-              {name:"options",
-                formatter:function(value,options,row){
-                    var content = "<a class='btn btn-primary' onclick=\"javascript:edit('"+row.id+"')\">修改</a>  "+
-                                    "<a class='btn btn-danger' onclick=\"javascript:del('"+row.id+"')\">删除</a>";
-                    return content;
+    $(function () {
+        //创建表格
+        $("#empTable").jqGrid({
+            styleUI : 'Bootstrap',
+            caption:"员工信息表",
+            autowidth:true,
+            url:"${app}/emp/findAll",
+            datatype:"json",
+            rowNum:2,
+            pager:"#pager",
+            viewrecords:true,
+            editurl:"",
+            colNames:["id","姓名","年龄","生日","操作"],
+            colModel:[
+                {name:"id"},
+                {name:"name",editable:true},
+                {name:"age",editable:true},
+                {name:"bir",editable:true},
+                {name:"options",
+                    formatter:function(value,options,row){
+                        var content = "<a class='btn btn-primary' onclick=\"javascript:edit('"+row.id+"')\">修改</a>  "+
+                            "<a class='btn btn-danger' onclick=\"javascript:del('"+row.id+"')\">删除</a>";
+                        return content;
+                    }
                 }
-              }
-          ]
-      }).jqGrid("navGrid","#pager",{edit:true,add:true,del:true,search:true,refresh:true});
-      //绑定save单击事件
-      $("#save").click(function(){
-          saveInfo();
-      });
-      //编辑一行
-      $("#edit").click(function () {
-          var gr = $("#empTable").jqGrid('getGridParam', 'selrow');
-          if (gr != null)
-              $("#empTable").jqGrid('editGridRow', gr, {
-                  height : 300,
-                  reloadAfterSubmit : true
-              });
-          else
-              alert("请选择一行!!!!");
-      });
+            ]
+        }).jqGrid("navGrid","#pager",{edit:true,add:true,del:true,search:true,refresh:true});
+        //绑定save单击事件
+        $("#save").click(function(){
+            saveInfo();
+        });
+        //编辑一行
+        $("#edit").click(function () {
+            var gr = $("#empTable").jqGrid('getGridParam', 'selrow');
+            if (gr != null)
+                $("#empTable").jqGrid('editGridRow', gr, {
+                    height : 300,
+                    reloadAfterSubmit : true
+                });
+            else
+                alert("请选择一行!!!!");
+        });
 
-      //删除一行
-      $("#del").click(function(){
-          var gr = $("#empTable").jqGrid('getGridParam', 'selrow');
-          if (gr != null)
-              $("#empTable").jqGrid('delGridRow', gr, {
-                  reloadAfterSubmit : true
-              });
-          else
-              alert("请选择一行,去删除!!!");
-      });
-  });
-  //封装修改方法
-  function edit(id){
-      $("#empTable").jqGrid('editGridRow', id, {
-          height : 300,
-          reloadAfterSubmit : true
-          });
-  }
-  //封装添加方法
-  function saveInfo(){
-      $("#empTable").jqGrid('editGridRow', "new", {
-          height : 300,
-          reloadAfterSubmit : true
-      });
-  }
-  //封装删除方法
+        //删除一行
+        $("#del").click(function(){
+            var gr = $("#empTable").jqGrid('getGridParam', 'selrow');
+            if (gr != null)
+                $("#empTable").jqGrid('delGridRow', gr, {
+                    reloadAfterSubmit : true
+                });
+            else
+                alert("请选择一行,去删除!!!");
+        });
+    });
+    //封装修改方法
+    function edit(id){
+        $("#empTable").jqGrid('editGridRow', id, {
+            height : 300,
+            reloadAfterSubmit : true
+        });
+    }
+    //封装添加方法
+    function saveInfo(){
+        $("#empTable").jqGrid('editGridRow', "new", {
+            height : 300,
+            reloadAfterSubmit : true
+        });
+    }
+    //封装删除方法
     function del(id){
         $("#empTable").jqGrid('delGridRow', id, {
             reloadAfterSubmit : true
