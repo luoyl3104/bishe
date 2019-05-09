@@ -1,0 +1,30 @@
+
+server:
+  port: 8989
+  jsp-servlet:
+    init-parameters:
+      development: true
+spring:
+  mvc:
+    view:
+      suffix: .jsp
+      prefix: /
+  datasource:
+    username: root
+    password: root
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://localhost:3306/bishe
+    driver-class-name: com.mysql.jdbc.Driver
+  http:
+    multipart:
+      max-file-size: 209715200
+      max-request-size: 209715200
+mybatis:
+  type-aliases-package: com.zzu.entity
+  mapper-locations: classpath:mapper/*.xml
+
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql

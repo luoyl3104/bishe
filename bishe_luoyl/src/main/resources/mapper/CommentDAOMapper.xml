@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zzu.dao.CommentDAO">
+
+    <resultMap id="commentMap" type="Comment">
+        <id column="id" property="id"/>
+        <result column="content" property="content"/>
+        <result column="sign" property="sign"/>
+        <result column="publish_date" property="publishDate"/>
+        <association property="user" javaType="User">
+            <id column="uid" property="id"/>
+            <result column="username" property="username"/>
+        </association>
+        <association property="view" javaType="View">
+            <id column="vid" property="id"/>
+            <result column="name" property="name"/>
+        </association>
+    </resultMap>
+
+
+    <!-- 查询 -->
+    <select id="selectByPage" resultMap="commentMap">
+        select c.id,c.content,c.sign,c.publish_date,u.id as uid,u.username,v.id as vid,v.name
+          from (select * from comment limit #{start},#{rows}) c
+          left join user u on c.user_id=u.id left join view v on c.view_id=v.id
+          order by c.publish_date desc
+    </select>
+
+
+
+</mapper>
