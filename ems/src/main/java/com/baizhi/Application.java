@@ -6,10 +6,12 @@ import tk.mybatis.spring.annotation.MapperScan;
 
 @SpringBootApplication
 @MapperScan("com.baizhi.dao")
-public class EmsApplication {
+public class Application {
 
     public static void main(String[] args) {
-        SpringApplication.run(EmsApplication.class, args);
+        System.out.println();
+
+        SpringApplication.run(Application.class, args);
     }
 
 }
