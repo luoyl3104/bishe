@@ -56,14 +56,13 @@ public class UserServiceImpl implements UserService {
         user.setType("激活");
         user.setId(UUID.randomUUID().toString());
         user.setRegistDate(new Date());
-        userDAO.insert(user);
+        userDAO.insertUser(user);
     }
 
+    //用于回显
     @Override
-    public User findOne(String id) {
-        User user = new User();
-        user.setId(id);
-        return userDAO.selectByPrimaryKey(user);
+    public User findOne(User user) {
+       return userDAO.selectByUsername(user.getUsername());
     }
 
     @Override
@@ -81,14 +80,32 @@ public class UserServiceImpl implements UserService {
             map.put("message",message);
         }else{
             if(loginUser.getPassword().equals(user.getPassword())){
-                HttpSession session = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getSession();
-                session.setAttribute("user",loginUser);
-                message = "login success";
-                map.put("message",message);
+                if(loginUser.getType().equals("冻结")){
+                    message = "该用户已被冻结~！";
+                    map.put("message",message);
+                }else {
+                    HttpSession session = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getSession();
+                    session.setAttribute("user",loginUser);
+                    message = "login success";
+                    map.put("message",message);
+                }
             }else {
                 message = "您输入的密码有误~！";
                 map.put("message",message);
             }
+        }
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> updateUser(User user) {
+        Map<String,Object> map = new HashMap<>();
+        User user1 = userDAO.selectByUsername(user.getUsername());
+        if (user1 != null && !user1.getId().equals(user.getId())) {
+            map.put("update",false);
+        }else {
+            userDAO.updateUser(user);
+            map.put("update",true);
         }
         return map;
     }

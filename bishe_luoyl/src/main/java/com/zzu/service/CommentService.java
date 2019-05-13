@@ -13,4 +13,8 @@ public interface CommentService {
 
     public void deleteComment(String id);
 
+    public List<Comment> findAll();
+
+    public List<Comment> findByViewId(String viewId);
+
 }

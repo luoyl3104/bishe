@@ -7,6 +7,7 @@
         <result column="username" property="username"/>
         <result column="password" property="password"/>
         <result column="type" property="type"/>
+        <result column="sex" property="sex"/>
         <result column="avatar" property="avatar"/>
         <result column="phone" property="phone"/>
         <result column="email" property="email"/>
@@ -20,16 +21,27 @@
 
     <!-- 查询 -->
     <select id="selectByPage" resultMap="userMap">
-        select u.id,u.username,u.password,u.type,u.avatar,u.phone,u.email,u.regist_date,p.id as pid,p.name
+        select u.id,u.username,u.password,u.type,u.sex,u.avatar,u.phone,u.email,u.regist_date,p.id as pid,p.name
             from (select * from user limit #{start},#{rows}) u
             left join province p on u.province_id=p.id
     </select>
 
     <select id="selectByUsername" resultMap="userMap" parameterType="String">
-        select u.id,u.username,u.password,u.type,u.avatar,u.phone,u.email,u.regist_date,p.id as pid,p.name
+        select u.id,u.username,u.password,u.type,u.sex,u.avatar,u.phone,u.email,u.regist_date,p.id as pid,p.name
             from user u left join province p on u.province_id=p.id
             where u.username=#{username}
     </select>
+
+    <!--注册-->
+    <insert id="insertUser" parameterType="User">
+        insert into user values(#{id},#{username},${password},#{sex},#{type},#{avatar},#{phone},#{email},#{registDate},#{province.id})
+    </insert>
+
+    <!--修改-->
+    <update id="updateUser" parameterType="User">
+        update user set username=#{username},password=#{password},sex=#{sex},phone=#{phone},email=#{email},province_id=#{province.id}
+          where id=#{id}
+    </update>
 
 
 </mapper>

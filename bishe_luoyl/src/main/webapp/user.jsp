@@ -9,14 +9,14 @@
             autowidth:true,
             url:"${app}/user/queryByPage",
             datatype:"json",
-            rowNum:2,
+            rowNum:7,
             pager:"#pager",
             viewrecords:true,
             colNames:["id","头像","用户名","密码","性别","手机号","Email","所在地","状态","注册时间","操作"],
             colModel:[
                 {name:"id",hidden:true},
                 {name:"avatar",formatter:function(value,options,row){
-                        var temp = "<img class='img-rounded' width='50px' height='30px' src='${app}/uploadAvatars/"
+                        var temp = "<img class='img-rounded' width='50px' height='30px' src='${app}/userAvatars/"
                         return temp + row.avatar +"'/>"
                     }},
                 {name:"username"},
@@ -55,7 +55,6 @@
 </ul>
 
 <div class="panel panel-default">
-
     <!--表-->
     <table class="table table-bordered table-striped" id="userTable">
     </table>

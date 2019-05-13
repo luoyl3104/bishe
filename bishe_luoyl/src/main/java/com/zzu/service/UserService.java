@@ -20,9 +20,11 @@ public interface UserService {
 
     public void register(User user);
 
-    public User findOne(String id);
+    public User findOne(User user);
 
     public User findByUsername(String username);
 
     public Map<String,Object> login(User user);
+
+    public Map<String,Object> updateUser(User user);
 }

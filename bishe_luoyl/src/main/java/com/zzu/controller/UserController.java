@@ -1,9 +1,11 @@
 package com.zzu.controller;
 
 
+import com.zzu.entity.Province;
 import com.zzu.entity.User;
 import com.zzu.entity.UserEcharts;
 import com.zzu.entity.UserList;
+import com.zzu.service.ProvinceService;
 import com.zzu.service.UserService;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -19,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -31,6 +34,34 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private ProvinceService provinceService;
+
+    //修改个人信息
+    @RequestMapping("update")
+    public Map<String,Object> editUser(User user){
+        Map<String, Object> map = userService.updateUser(user);
+        return map;
+    }
+
+    //回显个人信息
+    @RequestMapping("mine")
+    public Map<String,Object> queryOne(HttpSession session){
+        Map<String,Object> map = new HashMap<>();
+        List<Province> provinces = provinceService.findAll();
+        map.put("provinces",provinces);
+        User user = (User) session.getAttribute("user");
+        User one = userService.findOne(user);
+        map.put("user",one);
+        //System.out.println(one);
+        return map;
+    }
+
+    //安全退出
+    @RequestMapping("exit")
+    public void exit(HttpSession session){
+        session.invalidate();
+    }
 
     //登陆验证
     @RequestMapping("login")
@@ -42,8 +73,8 @@ public class UserController {
     @RequestMapping("register")
     public Map<String,Object> register(MultipartFile aaa ,User user,HttpServletRequest request) throws IOException {
         Map<String,Object> map = new HashMap<>();
-        String message;
         User user1 = userService.findByUsername(user.getUsername());
+        //System.out.println("---------------"+user.getProvince().getId());
         if(user1 == null){
             //上传头像
             String realPath = request.getSession().getServletContext().getRealPath("/userAvatars");
@@ -55,23 +86,14 @@ public class UserController {
             long time = new Date().getTime();
             String newFilename = String.valueOf(time) + "." +extension;
             //完成文件上传
-            aaa.transferTo(new File(realPath,filename));
+            aaa.transferTo(new File(realPath,newFilename));
             user.setAvatar(newFilename);
             userService.register(user);
-            message = "success";
-            map.put("message",message);
+            map.put("success",true);
         }else {
-            message = "该用户名已存在";
-            map.put("message",message);
+            map.put("success",false);
         }
         return map;
-    }
-
-    //回显个人信息
-    @RequestMapping("queryOne")
-    public User queryOne(String id){
-        User user = userService.findOne(id);
-        return user;
     }
 
     //修改用户状态
@@ -109,7 +131,7 @@ public class UserController {
         HSSFRow row = user.createRow(0);
 
         //表头
-        String[] strs = {"id","username","password","sex","province","phone","email","type","registDate"};
+        String[] strs = {"id","username","password","sex","phone","email","type","registDate"};
         for (int i = 0;i<strs.length;i++){
             HSSFCell cell = row.createCell(i);
             cell.setCellValue(strs[i]);
@@ -125,7 +147,6 @@ public class UserController {
             row1.createCell(1).setCellValue(users.get(i).getUsername());
             row1.createCell(2).setCellValue(users.get(i).getPassword());
             row1.createCell(3).setCellValue(users.get(i).getSex());
-            row1.createCell(4).setCellValue(users.get(i).getProvince().getName());
             row1.createCell(5).setCellValue(users.get(i).getPhone());
             row1.createCell(6).setCellValue(users.get(i).getEmail());
             row1.createCell(7).setCellValue(users.get(i).getType());

@@ -60,11 +60,13 @@
                         processData : false,  //必须false才会避开jQuery对 formdata 的默认处理
                         contentType : false,
                         success:function (result) {
-                            if(result.message=="success"){
-                                location.href="${app}/register_ok.jsp";
+                            if(result.success){
+                                alert()
+                                window.location.href="${app}/register_ok.jsp";
                             }else {
-                                $("#nameInfo").text(result.message);
+                                $("#nameInfo").text("用户名已存在，请重新输入~~");
                             }
+
                         }
                     })
                 });
@@ -80,7 +82,7 @@
 
 		</div>
 		<div class="fill_message" style="color:blue;">
-			<form id="editForm" name="ctl00" method="post" enctype="multipart/form-data" method="post">
+			<form id="editForm" name="ctl00" enctype="multipart/form-data" method="post">
 				<h2>
 					以下均为必填项!&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				</h2>
@@ -99,7 +101,7 @@
 									长度4－20个字符，一个汉字为两个字符。
 								</p>
 								<div id="error3" style="display:inline;color:red;"></div>
-								<span id="nameInfo"></span>
+								<span id="nameInfo" style="color: red"></span>
 							</div>
 						</td>
 					</tr>
@@ -158,7 +160,7 @@
 						</td>
 						<td>
 							&nbsp;
-							<select name="province" style="width: 100px;height: 25px;">
+							<select name="province.id" style="width: 100px;height: 25px;">
 								<c:forEach items="${requestScope.provinces}" var="pro">
 									<option value="${pro.id}">${pro.name}</option>
 								</c:forEach>
@@ -199,7 +201,7 @@
 					</tr>
 				</table>
 				<div class="login_in">
-					<input id="submit" class="button_1"  type="submit" value="注 册"/>
+					<input id="submit" class="button_1" value="注 册"/>
 				</div>
 			</form>
 		</div>

@@ -1,15 +1,17 @@
 package com.zzu.service.impl;
 
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import com.zzu.dao.ViewDAO;
+import com.zzu.entity.User;
 import com.zzu.entity.View;
 import com.zzu.service.ViewService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -23,11 +25,14 @@ public class ViewServiceImpl implements ViewService {
 
     @Transactional(propagation = Propagation.SUPPORTS)
     @Override
-    public List<View> findByPage(Integer start, Integer rows) {
-        PageHelper.startPage(start,rows);
-        List<View> views = viewDAO.selectByPage(start, rows);
-        PageInfo<View> viewPageInfo = new PageInfo<>(views);
-        return views;
+    public List<View> findByPage(Integer start, Integer rows,View view) {
+        try {
+            List<View> views = viewDAO.selectByPage(start, rows,view);
+            return views;
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
 
     }
 
@@ -58,5 +63,12 @@ public class ViewServiceImpl implements ViewService {
     @Override
     public void updateType(View view) {
         viewDAO.updateByPrimaryKeySelective(view);
+    }
+
+    @Override
+    public List<View> findByUser(Integer start,Integer rows) {
+        HttpSession session = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getSession();
+        User user = (User) session.getAttribute("user");
+        return viewDAO.selectByUsername(start,rows,user.getUsername());
     }
 }

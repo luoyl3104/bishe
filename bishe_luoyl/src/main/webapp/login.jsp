@@ -118,16 +118,34 @@ a{
 </STYLE>
      
 <SCRIPT type="text/javascript">
-$(function(){
 
-});
+	function login() {
+        var username = $("#username").val();
+        var password = $("#password").val();
+        if(username==null||username==""){
+            $("#error").html("用户名不能为空！");
+            return false;
+        }
+        if(password==null||password==""){
+            $("#error").html("密码不能为空！");
+            return false;
+        }
+        $.post("${app}/user/login",{username:username,password:password},function (result) {
+            if(result.message == "login success"){
+                window.location.href="${app}/main.jsp";
+            }else {
+                $("#error").text(result.message);
+            }
+        })
+    }
+
 </SCRIPT>
 </head>
 <body>
 <DIV class="top_div">
 </DIV>
 <form action="" method="post" >
-	<DIV style="background: rgb(255, 255, 255); margin: -100px auto auto; border: 1px solid rgb(231, 231, 231); border-image: none; width: 400px; height: 245px; text-align: center;">
+	<DIV style="background: rgb(255, 255, 255); margin: -100px auto auto; border: 1px solid rgb(231, 231, 231); border-image: none; width: 400px; height: 260px; text-align: center;">
 		<DIV style="width: 165px; height: 96px; position: absolute;">
 			<DIV class="tou">
 			</DIV>
@@ -138,19 +156,21 @@ $(function(){
 		</DIV>
 		<P style="padding: 30px 0px 10px; position: relative;">
 			<SPAN class="u_logo"></SPAN>
-			<INPUT id="userName" name="userName" class="ipt" type="text" placeholder="请输入用户名" value="${blogger.userName }"> 
+			<INPUT id="username" name="username" class="ipt" type="text" placeholder="请输入用户名" value="${blogger.userName }">
 	    </P>
 		<P style="position: relative;">
 			<SPAN class="p_logo"></SPAN>         
 			<INPUT id="password" name="password" class="ipt"  type="password" placeholder="请输入密码" value="${blogger.password }">   
 	  	</P>
-		<DIV style="height: 20px; line-height: 50px; margin-top: 30px; border-top-color: rgb(231, 231, 231); border-top-width: 1px; border-top-style: solid;">
+		<div style="height: 10px">
 			<span color="red" id="error"></span>
+		</div>
+		<DIV style="height: 20px; line-height: 50px; margin-top: 30px; border-top-color: rgb(231, 231, 231); border-top-width: 1px; border-top-style: solid;">
 			<P style="margin: 0px 35px 20px 45px;">
-			<SPAN style="float: left;">景点信息交流系统</SPAN>
-	        <SPAN style="float: right;"> 
-	              <input type="btn" id="submit" style="background: rgb(0, 142, 173); padding: 7px 10px; border-radius: 4px; border: 1px solid rgb(26, 117, 152); border-image: none; color: rgb(255, 255, 255); font-weight: bold;width: 30px" value="登录"/>
-			</SPAN>
+				<SPAN style="float: left;">景点信息交流系统</SPAN>
+	        	<SPAN style="float: right;">
+					<a href="javascript:login()" class="btn-primary" style="background: rgb(0, 142, 173); padding: 7px 10px; border-radius: 4px; border: 1px solid rgb(26, 117, 152); border-image: none; color: rgb(255, 255, 255); font-weight: bold;width: 30px">&nbsp;登录&nbsp;</a>
+				</SPAN>
 			</P>
 	    </DIV>
 		<DIV style="height: 40px; line-height: 50px; margin-top: 30px; border-top-color: rgb(231, 231, 231); border-top-width: 1px; border-top-style: solid;">

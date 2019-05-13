@@ -35,5 +35,15 @@ public class CommentServiceImpl implements CommentService {
         commentDAO.delete(comment);
     }
 
+    @Override
+    public List<Comment> findAll() {
+        return commentDAO.selectAllComment();
+    }
+
+    @Override
+    public List<Comment> findByViewId(String viewId) {
+        return commentDAO.selectByViewId(viewId);
+    }
+
 
 }

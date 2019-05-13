@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface ViewService {
 
-    public List<View> findByPage(Integer start,Integer rows);
+    public List<View> findByPage(Integer start,Integer rows,View view);
 
     public Long findTotals();
 
@@ -17,5 +17,7 @@ public interface ViewService {
     public void removeView(String id);
 
     public void updateType(View view);
+
+    public List<View> findByUser(Integer start,Integer rows);
 
 }

@@ -31,6 +31,352 @@
         }
 
     </style>
+
+    <script>
+
+        //安全退出
+        function exit() {
+            $.post("${app}/user/exit",null,function () {
+                window.location.href="${app}/login.jsp";
+            })
+        }
+
+        //初始化页面---展示信息
+        function initData(page,viewName,viewProvince){
+            $("#main").empty();
+            $.post("${app}/view/show",{page:page,name:viewName,provinceId:viewProvince},function (result) {
+                var views = result.views;
+                var comments = result.comments;
+                //console.log(views);
+                //console.log(comments)
+                $.each(views,function (i, view) {
+                    var div1 = $("<div class='clo-lg-10'/>");
+                    $("#main").append(div1);
+                    var div2 = $("<div class='tn-list'/>");
+                    div1.append(div2);
+                    var div3 = $("<div class='tn-item clearfix'/>");
+                    div2.append(div3);
+                    var div4 = $("<div style='height: 10px'/>");
+                    div3.append(div4);
+                    var div5 = $("<div class='col-md-4'>");
+                    var img1 = $("<img width='220px' height='150px'>").attr("src","${app}/uploadViews/"+view.picture);
+                    div5.append(img1);
+                    div3.append(div5);
+                    var div6 = $("<div class='col-md-6'>");
+                    div3.append(div6);
+                    var dl = $("<dl/>");
+                    div6.append(dl);
+                    var dt = $("<dt/>").text(view.name);
+                    dl.append(dt);
+                    var dd = $("<dd/>");
+                    var a1 = $("<a target='_blank'/>").text(view.des);
+                    a1.attr("href","javascript:viewDetail("+view.id+")");
+                    dd.append(a1);
+                    dl.append(dd);
+                    var div7 = $("<div class='tn-extra'/>")
+                    div6.append(div7);
+                    var span1 = $("<span class='tn-place'/>");
+                    div7.append(span1)
+                    var span2 = $("<span class='glyphicon glyphicon-map-marker' rel='nofollow'/>").text(view.province.name+", by: ");
+                    span1.append(span2);
+                    var span3 = $("<span class='tn-user'/>");
+                    div7.append(span3);
+                    var a2 = $("<a target='_blank' rel='nofollow'/>");
+                    span3.append(a2);
+                    var img2 = $("<img width='30px' height='16px'/>").attr("src","${app}/userAvatars/"+view.user.avatar);
+                    a2.append(img2);
+                    var span4 = $("<span/>").text("     "+view.user.username);
+                    a2.append(span4);
+                    var hr = $("<hr/>");
+                    //div7.append(hr);
+                    var div8 = $("<div class='col-md-6'/>")
+                    div3.append(div8);
+                    var h = $("<h3/>").text("评论区")
+                    div8.append(h);
+                    $.each(comments,function (i, comment) {
+                        if(comment.view.id==view.id){
+                            var span5 = $("<span/><br>").text(comment.user.username+" : "+comment.content);
+                            div8.append(span5);
+                        }
+                    });
+                    //div8.append(hr);
+                    var form = $("<form/>");
+                    div8.append(form);
+                    var input = $("<input type='text' placeholder='追加评论'/>");
+                    var span5 = $("<span/>").text("       ");
+                    form.append(input);
+                    form.append(span5);
+                    var a3 = $("<a href='javascript:' class='btn-primary' style='background: rgb(0, 142, 173); padding: 7px 8px; border-radius: 4px; border: 1px solid rgb(26, 117, 152); border-image: none; color: rgb(255, 255, 255); font-weight: bold;width: 30px;'/>").text("--发送--");
+                    form.append(a3);
+                    div1.append(hr);
+                })
+                //生成上一页、下一页
+                $("#page").empty();
+                //console.log(result.pageNow);
+                var pageNow = result.pageNow;
+                var pageTotal = result.pageTotal;
+                /*
+                  <li><a href="#">Previous</a></li>
+                  <li><a href="#">Next</a></li>
+                */
+                var sli = $("<li/>");
+                $("#page").append(sli);
+                var sa = $("<a/>").attr("href","javascript:search("+pageNow-1+")");
+                var s = $("<span/>").html("&laquo");
+                sa.append(s);
+                sli.append(sa);
+                //上一页状态
+                if(pageNow==1){
+                    sli.addClass("disabled");
+                    sa.removeAttr("href");
+                }
+                var nli = $("<li/>");
+                $("#page").append(nli);
+                var na = $("<a/>").attr("href","javascript:search("+pageNow+1+")");
+                var n = $("<span/>").html("&raquo");
+                na.append(n);
+                nli.append(na);
+                //下一页状态
+                if(pageNow==pageTotal){
+                    nli.addClass("disabled");
+                    na.removeAttr("href");
+                }
+            });
+        }
+
+        //提交搜索
+        function search(page){
+            var name = $("#viewName").val();
+            var provinceId = $("#viewProvince").val();
+            initData(page,name,provinceId);
+        }
+
+
+        $(function () {
+
+            initData();
+
+            //图片 、下拉列表
+            $.post("${app}/view/img",function (result) {
+                var views = result.views;
+                var provinces = result.provinces;
+                $.each(views,function (i, view) {
+                    var ul = $("<ul class='show-nav'/>");
+                    $("#im").append(ul);
+                    var a =$("<a/>");
+                    ul.append(a);
+                    var img = $("<img width='110px' height='62px'/>").attr("src","${app}/uploadViews/"+view.picture);
+                    a.append(img);
+                })
+                $.each(provinces,function (i, province) {
+                    var option = $("<option value='"+province.id+"'/>").text(province.name);
+                    $("#viewProvince").append(option);
+                })
+
+            })
+
+
+            //监听模态框打开
+            $("#modUserInfo").on('show.bs.modal',function (e) {
+                $("#editForm")[0].reset();//重置表单
+                $("#pro").empty();
+                $.post("${app}/user/mine",function (result) {
+                    //console.log(result.provinces);
+                    //console.log(result.user);
+                    var provinces = result.provinces;
+                    var user = result.user;
+                    $("#uid").val(user.id);
+                    $("#img").attr("src","${app}/userAvatars/"+user.avatar);
+                    $("#username").val(user.username);
+                    $("#pwd").val(user.password);
+                    if(user.sex == "男"){
+                        var sexOption1 = $("<option value='男' selected>男</option>");
+                        var sexOption2 = $("<option value='女'>女</option>");
+                        $("#sex").append(sexOption1);
+                        $("#sex").append(sexOption2);
+                    }
+                    if(user.sex == "女"){
+                        var sexOption1 = $("<option value='男'>男</option>");
+                        var sexOption2 = $("<option value='女' selected>女</option>");
+                        $("#sex").append(sexOption1);
+                        $("#sex").append(sexOption2);
+                    }
+                    $.each(provinces,function (i, province) {
+                        if(user.province.id == province.id){
+                            var proOption = $("<option value='"+province.id+"' selected>"+province.name+"</option>");
+                            $("#pro").append(proOption);
+                        }
+                        if(user.province.id != province.id){
+                            var proOption = $("<option value='"+province.id+"'>"+province.name+"</option>");
+                            $("#pro").append(proOption);
+                        }
+                    });
+                    $("#phone").val(user.phone);
+                    $("#email").val(user.email);
+                })
+            })
+            //提交修改
+            $("#userInfo").click(function () {
+                $.post("${app}/user/update",$("#userForm").serialize(),function (result) {
+                    if(result.update){
+                        alert("修改个人信息成功~！");
+                        //关闭模态框
+                        $("#modUserInfo").modal('hide');
+                    }else {
+                        alert("用户名已存在，请重新修改~！");
+                    }
+                })
+            });
+
+        });
+
+        //与我相关
+        function myView(page) {
+            $.post("${app}/view/myView",{page:page},function (result) {
+                $("#main").empty();
+                var views = result.views;
+                var comments = result.comments;
+                //console.log(views);
+                //console.log(comments)
+                $.each(views,function (i, view) {
+                    var div1 = $("<div class='clo-lg-10'/>");
+                    $("#main").append(div1);
+                    var div2 = $("<div class='tn-list'/>");
+                    div1.append(div2);
+                    var div3 = $("<div class='tn-item clearfix'/>");
+                    div2.append(div3);
+                    var div4 = $("<div style='height: 10px'/>");
+                    div3.append(div4);
+                    var div5 = $("<div class='col-md-4'>");
+                    var img1 = $("<img width='220px' height='150px'>").attr("src","${app}/uploadViews/"+view.picture);
+                    div5.append(img1);
+                    div3.append(div5);
+                    var div6 = $("<div class='col-md-6'>");
+                    div3.append(div6);
+                    var dl = $("<dl/>");
+                    div6.append(dl);
+                    var dt = $("<dt/>").text(view.name);
+                    dl.append(dt);
+                    var dd = $("<dd/>");
+                    var a1 = $("<a target='_blank'/>").text(view.des);
+                    a1.attr("href","javascript:viewDetail("+view.id+")");
+                    dd.append(a1);
+                    dl.append(dd);
+                    var div7 = $("<div class='tn-extra'/>")
+                    div6.append(div7);
+                    var span1 = $("<span class='tn-place'/>");
+                    div7.append(span1)
+                    var span2 = $("<span class='glyphicon glyphicon-map-marker' rel='nofollow'/>").text(view.province.name+", by: ");
+                    span1.append(span2);
+                    var span3 = $("<span class='tn-user'/>");
+                    div7.append(span3);
+                    var a2 = $("<a target='_blank' rel='nofollow'/>");
+                    span3.append(a2);
+                    var img2 = $("<img width='30px' height='16px'/>").attr("src","${app}/userAvatars/"+view.user.avatar);
+                    a2.append(img2);
+                    var span4 = $("<span/>").text("     "+view.user.username);
+                    a2.append(span4);
+                    var hr = $("<hr/>");
+                    //div7.append(hr);
+                    var div8 = $("<div class='col-md-6'/>")
+                    div3.append(div8);
+                    var h = $("<h3/>").text("评论区")
+                    div8.append(h);
+                    $.each(comments,function (i, comment) {
+                        if(comment.view.id==view.id){
+                            var span5 = $("<span/><br>").text(comment.user.username+" : "+comment.content);
+                            div8.append(span5);
+                        }
+                    });
+                    //div8.append(hr);
+                    var form = $("<form/>");
+                    div8.append(form);
+                    var input = $("<input type='text' placeholder='追加评论'/>");
+                    var span5 = $("<span/>").text("       ");
+                    form.append(input);
+                    form.append(span5);
+                    var a3 = $("<a href='javascript:' class='btn-primary' style='background: rgb(0, 142, 173); padding: 7px 8px; border-radius: 4px; border: 1px solid rgb(26, 117, 152); border-image: none; color: rgb(255, 255, 255); font-weight: bold;width: 30px;'/>").text("--发送--");
+                    form.append(a3);
+                    div1.append(hr);
+                })
+                //清除上一页、下一页
+                $("#page").empty();
+            });
+        }
+
+        //展示详情
+        function viewDetail(id) {
+            $.post("${app}/view/viewDetail",{viewId:id},function (result) {
+                $("#main").empty();
+                var view = result.view;
+                var comments = result.comments;
+                //console.log(views);
+                //console.log(comments)
+                var div1 = $("<div class='clo-lg-10'/>");
+                $("#main").append(div1);
+                var div2 = $("<div class='tn-list'/>");
+                div1.append(div2);
+                var div3 = $("<div class='tn-item clearfix'/>");
+                div2.append(div3);
+                var div4 = $("<div style='height: 10px'/>");
+                div3.append(div4);
+                var div5 = $("<div class='col-md-4'>");
+                var img1 = $("<img width='220px' height='150px'>").attr("src","${app}/uploadViews/"+view.picture);
+                div5.append(img1);
+                div3.append(div5);
+                var div6 = $("<div class='col-md-6'>");
+                div3.append(div6);
+                var dl = $("<dl/>");
+                div6.append(dl);
+                var dt = $("<dt/>").text(view.name);
+                dl.append(dt);
+                var dd = $("<dd/>");
+                var a1 = $("<span target='_blank'/>").text(view.des);
+                dd.append(a1);
+                dl.append(dd);
+                var div7 = $("<div class='tn-extra'/>")
+                div6.append(div7);
+                var span1 = $("<span class='tn-place'/>");
+                div7.append(span1)
+                var span2 = $("<span class='glyphicon glyphicon-map-marker' rel='nofollow'/>").text(view.province.name+", by: ");
+                span1.append(span2);
+                var span3 = $("<span class='tn-user'/>");
+                div7.append(span3);
+                var a2 = $("<a target='_blank' rel='nofollow'/>");
+                span3.append(a2);
+                var img2 = $("<img width='30px' height='16px'/>").attr("src","${app}/userAvatars/"+view.user.avatar);
+                a2.append(img2);
+                var span4 = $("<span/>").text("     "+view.user.username);
+                a2.append(span4);
+                var hr = $("<hr/>");
+                //div7.append(hr);
+                var div8 = $("<div class='col-md-6'/>")
+                div3.append(div8);
+                var h = $("<h3/>").text("评论区")
+                div8.append(h);
+                $.each(comments,function (i, comment) {
+                    var span5 = $("<span/><br>").text(comment.user.username+" : "+comment.content);
+                    div8.append(span5);
+                });
+                var form = $("<form/>");
+                div8.append(form);
+                var input = $("<input type='text' placeholder='追加评论'/>");
+                var span5 = $("<span/>").text("       ");
+                form.append(input);
+                form.append(span5);
+                var a3 = $("<a href='javascript:' class='btn-primary' style='background: rgb(0, 142, 173); padding: 7px 8px; border-radius: 4px; border: 1px solid rgb(26, 117, 152); border-image: none; color: rgb(255, 255, 255); font-weight: bold;width: 30px;'/>").text("--发送--");
+                form.append(a3);
+                div1.append(hr);
+                //清除上一页、下一页
+                $("#page").empty();
+            })
+        }
+
+
+    </script>
+
+
+
 </head>
 
 <body>
@@ -51,6 +397,7 @@
                     <span class="caret"></span></a>
                 <ul class="dropdown-menu">
                     <li><a href="#modUserInfo" data-toggle="modal">个人中心</a></li>
+                    <li><a href="javascript:myView(1)">与我相关</a></li>
                 </ul>
             </li>
 
@@ -70,7 +417,7 @@
                     <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu">
-                    <li><a href="#">退出登录</a></li>
+                    <li><a onclick="javascript:exit()">退出登录</a></li>
                 </ul>
             </li>
         </ul>
@@ -80,26 +427,12 @@
 <div class="container-fluid">
     <div class="row">
         <!--左栏-->
-        <div class="col-md-2">
+        <div class="col-md-2" id="im">
 
             <ul class="list-group">
-                <a >欢迎:<img src="${app}/userAvatars/${sessionScope.user.avatar}">&nbsp;&nbsp;XXX${sessionScope.user.username}</a>
+                <a >欢迎:<img width="30px" height="20px" src="${app}/userAvatars/${sessionScope.user.avatar}">&nbsp;&nbsp;${sessionScope.user.username}</a>
             </ul>
-            <ul class="show-nav">
-                <a><img height="62" width="110" src="https://b1-q.mafengwo.net/s13/M00/2D/96/wKgEaVzOn2yACMocAALG4FavNXI39.jpeg?imageMogr2%2Fthumbnail%2F%21108x67r%2Fgravity%2FCenter%2Fcrop%2F%21108x67%2Fquality%2F90"></a>
-            </ul>
-            <ul class="show-nav">
-                <a><img src="https://n2-q.mafengwo.net/s13/M00/4C/01/wKgEaVzOOCuAXiUcAAGyAzoh6P088.jpeg?imageMogr2%2Fthumbnail%2F%21108x67r%2Fgravity%2FCenter%2Fcrop%2F%21108x67%2Fquality%2F90" height="62" width="110"></a>
-            </ul>
-            <ul class="show-nav">
-                <a><img src="https://p3-q.mafengwo.net/s13/M00/74/D9/wKgEaVzIEOyAQ3ZyAAI8CSx_YP005.jpeg?imageMogr2%2Fthumbnail%2F%21108x67r%2Fgravity%2FCenter%2Fcrop%2F%21108x67%2Fquality%2F90" height="62" width="110"></a>
-            </ul>
-            <ul class="show-nav">
-                <a><img src="https://n4-q.mafengwo.net/s13/M00/76/17/wKgEaVzIETaAVF8JAAPj3UZ8TbM75.jpeg?imageMogr2%2Fthumbnail%2F%21108x67r%2Fgravity%2FCenter%2Fcrop%2F%21108x67%2Fquality%2F90" height="62" width="110"></a>
-            </ul>
-            <ul class="show-nav">
-                <a><img src="https://n4-q.mafengwo.net/s13/M00/23/B0/wKgEaVzH_tuATsW4AAJyuY-W1Rk74.jpeg?imageMogr2%2Fthumbnail%2F%21108x67r%2Fgravity%2FCenter%2Fcrop%2F%21108x67%2Fquality%2F90" height="62" width="110"></a>
-            </ul>
+
 
 
         </div>
@@ -113,127 +446,37 @@
                 <div class="panel-body">
                     <form class="form-inline">
                         <div class="form-group">
-                            <label for="exampleInputName2">景点名称</label>
-                            <input type="text" class="form-control" id="exampleInputName2" placeholder="">
+                            <label for="viewName">景点名称</label>
+                            <input type="text" class="form-control" id="viewName" placeholder="请输入景点名称">
                         </div>
                         <div class="form-group">
-                            <label for="exampleInputEmail2">景点所在地</label>
-                            <select class="form-control" id="exampleInputEmail2">
-                                <option>---请选择---</option>
-                                <option>2</option>
+                            <label for="viewProvince">景点所在地</label>
+                            <select class="form-control" id="viewProvince">
+                                <option>---请选择景点所在地---</option>
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-primary ">查询</button>
+                        <button class="btn btn-primary" id="selectBtn" onclick="javascript:search(1);">查询</button>
                     </form>
                 </div>
             </div>
             <!--主内容-->
-            <div class="panel panel-default">
+            <div class="panel panel-default" id="main">
 
-                <div>
-                    <div class="tn-list">
-                        <div class="tn-item clearfix">
-                            <div style="height: 10px"></div>
-                            <div class="col-md-4">
-                                <a href="" target="_blank">
-                                    <img class="" src="http://p3-q.mafengwo.net/s11/M00/58/81/wKgBEFst2JaAQWKDAAXU-mm31fA63.jpeg?imageMogr2%2Fthumbnail%2F%21220x150r%2Fstrip%2Fgravity%2FCenter%2Fcrop%2F%21220x150%2Fquality%2F90"
-                                         style="display: inline;">
-                                </a>
-                            </div>
-                            <div class="col-md-6">
-                                <dl>
-                                    <dt>苏州吃面指南|一个人吃下七家店十碗面，一口一口把苏州吃进胃里</dt>
-                                    <dd>
-                                        <a target="_blank">前些天，因为想吃一碗面，酥饼去了趟 苏州 结果吃了12345678碗还不想走 每天在 苏州 只做两件事 吃面 消化 吃面 消化··· 不是在吃面 那就应该是在去吃面的路上 觉得做一个一心一意吃面的...</a>
-                                    </dd>
-                                </dl>
-                                <div class="tn-extra"><span class="tn-place"><i></i>
-                                    <span class="glyphicon glyphicon-map-marker" rel="nofollow" data-type="2">苏州</span>，by
-                                    </span>
-                                    <span class="tn-user">
-                                        <a href="/u/43842793.html" target="_blank" rel="nofollow">
-                                            <img src="http://b3-q.mafengwo.net/s11/M00/71/C6/wKgBEFrCHK2APvTmAAB7w6OnbOU49.jpeg?imageMogr2%2Fthumbnail%2F%2116x16r%2Fgravity%2FCenter%2Fcrop%2F%2116x16%2Fquality%2F90">
-                                            七个酥饼
-                                        </a>
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div>
-                                    <h3>评论区</h3>
-                                    <span>小明:楼主好品味</span>
-                                </div>
-                                <div>
-                                    <form action="" method="post">
-                                        <input type="text">
-                                        <input type="submit" value="发送">
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                    <hr>
-                </div>
-
-                <div>
-                    <div class="tn-list">
-                        <div class="tn-item clearfix">
-                            <div style="height: 10px"></div>
-                            <div class="col-md-4">
-                                <a href="" target="_blank">
-                                    <img class="" src="http://p3-q.mafengwo.net/s11/M00/58/81/wKgBEFst2JaAQWKDAAXU-mm31fA63.jpeg?imageMogr2%2Fthumbnail%2F%21220x150r%2Fstrip%2Fgravity%2FCenter%2Fcrop%2F%21220x150%2Fquality%2F90"
-                                         style="display: inline;">
-                                </a>
-                            </div>
-                            <div class="col-md-6">
-                                <dl>
-                                    <dt>苏州吃面指南|一个人吃下七家店十碗面，一口一口把苏州吃进胃里</dt>
-                                    <dd>
-                                        <a target="_blank">前些天，因为想吃一碗面，酥饼去了趟 苏州 结果吃了12345678碗还不想走 每天在 苏州 只做两件事 吃面 消化 吃面 消化··· 不是在吃面 那就应该是在去吃面的路上 觉得做一个一心一意吃面的...</a>
-                                    </dd>
-                                </dl>
-                                <div class="tn-extra"><span class="tn-place"><i></i>
-                                    <span class="glyphicon glyphicon-map-marker" rel="nofollow" data-type="2">苏州</span>，by
-                                    </span>
-                                    <span class="tn-user">
-                                        <a href="/u/43842793.html" target="_blank" rel="nofollow">
-                                            <img src="http://b3-q.mafengwo.net/s11/M00/71/C6/wKgBEFrCHK2APvTmAAB7w6OnbOU49.jpeg?imageMogr2%2Fthumbnail%2F%2116x16r%2Fgravity%2FCenter%2Fcrop%2F%2116x16%2Fquality%2F90">
-                                            七个酥饼
-                                        </a>
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div>
-                                    <h3>评论区</h3>
-                                    <span>小明:楼主好品味</span>
-                                </div>
-                                <div>
-                                    <form action="" method="post">
-                                        <input type="text">
-                                        <input type="submit" value="发送">
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                    <hr>
-                </div>
 
 
             </div>
-            <!--分页-->
-            <nav aria-label="Page navigation">
-                <ul class="pager">
-                    <li><a href="#">Previous</a></li>
-                    <li><a href="#">Next</a></li>
-                </ul>
-            </nav>
+            <%--连接，返回首页--%>
+            <a href="javascript:initData(1,null,null)">返回首页</a>
         </div>
     </div>
 </div>
+
+<!--分页-->
+<nav aria-label="Page navigation">
+    <ul class="pager" id="page">
+
+    </ul>
+</nav>
 
 
 <!--模态框-->
@@ -252,8 +495,7 @@
                     <div class="form-group">
                         <label class="control-label col-xs-2">用户头像</label>
                         <div class="col-xs-8">
-                            <img src="${app}/userAvatars/1.gif">
-                            <input type="file" name="file" id="pic" class="form-control">
+                            <img id="img" width="50px" height="30px">
                         </div>
                     </div>
                     <div class="form-group">
@@ -272,16 +514,15 @@
                         <label class="control-label col-xs-2">性别</label>
                         <div class="col-xs-8">
                             <select name="sex" id="sex" style="width: 60px">
-                                <option value="男">男</option>
-                                <option value="女">女</option>
+
                             </select>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="control-label col-xs-2">所在地</label>
                         <div class="col-xs-8">
-                            <select name="provinceId" id="pro" style="width: 100px">
-                                <option value="">北京</option>
+                            <select name="province.id" id="pro" style="width: 100px">
+
                             </select>
                         </div>
                     </div>

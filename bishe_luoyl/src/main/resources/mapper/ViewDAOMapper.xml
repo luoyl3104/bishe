@@ -14,6 +14,7 @@
         <association property="user" javaType="User">
             <id column="uid" property="id"/>
             <result column="username" property="username"/>
+            <result column="avatar" property="avatar"/>
         </association>
         <association property="province" javaType="Province">
             <id column="pid" property="id"/>
@@ -23,16 +24,36 @@
     
     <!-- 查询 -->
     <select id="selectByPage" resultMap="viewMap">
-        select v.id,v.name,v.picture,v.score,v.path,v.des,v.type,v.upload_date,u.id as uid,u.username,p.id as pid,p.name as pname
-            from (select * from view limit #{start},#{rows}) v
+        select v.id,v.name,v.picture,v.score,v.path,v.des,v.type,v.upload_date,u.id as uid,u.username,u.avatar,p.id as pid,p.name as pname
+            from (select * from view
+            <where>
+              <if test="view.name != null and view.name != ''">
+                  name like concat(concat("%",#{view.name}),"%")
+              </if>
+              <if test="view.province.id != null and view.province.id != ''">
+                  and province_id = #{view.province.id}
+              </if>
+            </where>
+            limit #{start},#{rows}) v
             left join user u on v.user_id=u.id left join province p on v.province_id=p.id
     </select>
-    
+
+    <select id="selectByUsername" resultMap="viewMap">
+        select v.id,v.name,v.picture,v.score,v.path,v.des,v.type,v.upload_date,u.id as uid,u.username,u.avatar,p.id as pid,p.name as pname
+            from view v left join user u on v.user_id=u.id left join province p on v.province_id=p.id
+            where u.username=#{username}
+            <if test="start != null and rows != null">
+                limit #{start},#{rows}
+            </if>
+    </select>
+
     <!--回显-->
     <select id="findOne" resultMap="viewMap" parameterType="String">
-        select v.id,v.name,v.picture,v.score,v.path,v.des,v.type,v.upload_date,u.id as uid,u.username,p.id as pid,p.name as pname
-            from view v left join user u on v.userid=u.id left join province p on v.province_id=p.id
+        select v.id,v.name,v.picture,v.score,v.path,v.des,v.type,v.upload_date,u.id as uid,u.username,u.avatar,p.id as pid,p.name as pname
+            from view v left join user u on v.user_id=u.id left join province p on v.province_id=p.id
             where v.id=#{id}
     </select>
+
+
 
 </mapper>
