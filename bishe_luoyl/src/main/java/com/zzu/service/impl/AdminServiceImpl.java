@@ -33,6 +33,7 @@ public class AdminServiceImpl implements AdminService {
             if(login.getPassword().equals(admin.getPassword())){
                 HttpSession session = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getSession();
                 session.setAttribute("admin",login);
+                map.put("message","success");
             }else {
                 message = "您输入的密码有误~！";
                 map.put("message",message);

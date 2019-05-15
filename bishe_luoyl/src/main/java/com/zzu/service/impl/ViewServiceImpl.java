@@ -49,10 +49,10 @@ public class ViewServiceImpl implements ViewService {
 
     @Override
     public void addView(View view) {
-        view.setId(UUID.randomUUID().toString());
+        view.setId(String.valueOf(new Date().getTime()));
         view.setUploadDate(new Date());
         view.setType("开放");
-        viewDAO.insert(view);
+        viewDAO.insertView(view);
     }
 
     @Override

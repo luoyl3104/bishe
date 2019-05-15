@@ -21,7 +21,13 @@
             <result column="pname" property="name"/>
         </association>
     </resultMap>
-    
+
+
+    <insert id="insertView" parameterType="View">
+        insert into view values (#{id},#{name},#{picture},#{score},#{path},#{des},#{type},#{uploadDate},#{user.id},#{province.id})
+    </insert>
+
+
     <!-- 查询 -->
     <select id="selectByPage" resultMap="viewMap">
         select v.id,v.name,v.picture,v.score,v.path,v.des,v.type,v.upload_date,u.id as uid,u.username,u.avatar,p.id as pid,p.name as pname
@@ -36,6 +42,7 @@
             </where>
             limit #{start},#{rows}) v
             left join user u on v.user_id=u.id left join province p on v.province_id=p.id
+        order by v.upload_date desc
     </select>
 
     <select id="selectByUsername" resultMap="viewMap">
@@ -53,7 +60,5 @@
             from view v left join user u on v.user_id=u.id left join province p on v.province_id=p.id
             where v.id=#{id}
     </select>
-
-
 
 </mapper>

@@ -18,6 +18,11 @@
     </resultMap>
 
 
+    <insert id="insertComment" parameterType="Comment">
+        insert into comment values(#{id},#{content},#{sign},#{publishDate},#{user.id},#{view.id})
+    </insert>
+
+
     <!-- 查询 -->
     <select id="selectByPage" resultMap="commentMap">
         select c.id,c.content,c.sign,c.publish_date,u.id as uid,u.username,v.id as vid,v.name
@@ -30,14 +35,14 @@
     <select id="selectAllComment" resultMap="commentMap">
         select c.id,c.content,c.sign,c.publish_date,u.id as uid,u.username,v.id as vid,v.name
           from comment c left join user u on c.user_id=u.id left join view v on c.view_id=v.id
-          order by c.publish_date asc
+          order by c.publish_date desc
     </select>
 
     <select id="selectByViewId" parameterType="String" resultMap="commentMap">
         select c.id,c.content,c.sign,c.publish_date,u.id as uid,u.username,v.id as vid,v.name
           from comment c left join user u on c.user_id=u.id left join view v on c.view_id=v.id
           where v.id=#{viewId}
-          order by c.publish_date asc
+          order by c.publish_date desc
     </select>
 
 

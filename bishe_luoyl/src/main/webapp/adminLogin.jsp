@@ -36,7 +36,7 @@
 				$.post("${app}/admin/login",$("#loginForm").serialize(),function (result) {
 					if(result.message == "success"){
 					    //alert()
-						location.href = "${app}/index.jsp";
+						window.location.href = "${app}/index.jsp";
 					}else{
                         $("#span").text(result.message);
                     }

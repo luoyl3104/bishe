@@ -12,14 +12,13 @@
           rowNum:3,
           pager:"#pager",
           viewrecords:true,
-          colNames:["id","评论内容","评论发布者","评论景点","发布时间","支持数","操作"],
+          colNames:["id","评论内容","评论发布者","评论景点","发布时间","操作"],
           colModel:[
               {name:"id", hidden:true},
               {name:"content"},
               {name:"user.username"},
               {name:"view.name"},
               {name:"publishDate"},
-              {name:"sign"},
               {name:"options",
                   formatter:function(value,options,row){
                       var content = "  <a class='btn btn-primary' onclick=\"javasctipt:del(\'"+row.path+"'\,\'"+row.id+"'\)\">删除评论</a>";

@@ -48,12 +48,17 @@ public class UserController {
     @RequestMapping("mine")
     public Map<String,Object> queryOne(HttpSession session){
         Map<String,Object> map = new HashMap<>();
-        List<Province> provinces = provinceService.findAll();
-        map.put("provinces",provinces);
         User user = (User) session.getAttribute("user");
-        User one = userService.findOne(user);
-        map.put("user",one);
-        //System.out.println(one);
+        System.out.println(user);
+        if(user == null){
+            map.put("message",false);
+        }else {
+            List<Province> provinces = provinceService.findAll();
+            map.put("provinces",provinces);
+            User one = userService.findOne(user);
+            map.put("user",one);
+            map.put("message",true);
+        }
         return map;
     }
 

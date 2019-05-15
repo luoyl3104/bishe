@@ -13,7 +13,7 @@
             rowNum:3,
             pager:"#pager",
             viewrecords:true,
-            colNames:["id","景点名称","点赞数","景点描述","景点图片","所在地","信息状态","图片存储路径","上传时间","上传者","操作"],
+            colNames:["id","景点名称","星级","景点描述","景点图片","所在地","信息状态","图片存储路径","上传时间","上传者","操作"],
             colModel:[
                 {name:"id", hidden:true},
                 {name:"name"},

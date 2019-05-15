@@ -4,7 +4,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
-		<title>用户注册</title>
+		<title>注册中心</title>
 		<link href="${pageContext.request.contextPath }/front/css/login.css" rel="stylesheet" type="text/css" />
 		<link href="${pageContext.request.contextPath }/front/css/page_bottom.css" rel="stylesheet" type="text/css" />
 		<script src="${pageContext.request.contextPath }/statics/boot/js/jquery-3.3.1.min.js"></script>
@@ -84,7 +84,7 @@
 		<div class="fill_message" style="color:blue;">
 			<form id="editForm" name="ctl00" enctype="multipart/form-data" method="post">
 				<h2>
-					以下均为必填项!&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					请填写您的个人信息&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				</h2>
 				<table class="tab_login" >
 					<tr>
@@ -201,7 +201,7 @@
 					</tr>
 				</table>
 				<div class="login_in">
-					<input id="submit" class="button_1" value="注 册"/>
+					<button id="submit" class="btn-default">&nbsp;&nbsp;&nbsp;&nbsp;注&nbsp;册&nbsp;&nbsp;&nbsp;&nbsp;</button>
 				</div>
 			</form>
 		</div>

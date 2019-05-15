@@ -1,6 +1,7 @@
 package com.zzu.controller;
 
 import com.zzu.entity.Comment;
+import com.zzu.entity.View;
 import com.zzu.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,18 @@ public class CommentController {
 
     @Autowired
     private CommentService commentService;
+
+    //添加评论
+    @RequestMapping("save")
+    public Map<String,Object> saveComment(String content,String viewId){
+        View view = new View();
+        view.setId(viewId);
+        Comment comment = new Comment();
+        comment.setContent(content);
+        comment.setView(view);
+        Map<String, Object> map = commentService.addComment(comment);
+        return map;
+    }
 
     @RequestMapping("queryByPage")
     public Map<String,Object> queryByPage(Integer page,Integer rows){

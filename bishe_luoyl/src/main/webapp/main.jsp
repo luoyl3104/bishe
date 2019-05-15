@@ -47,8 +47,12 @@
             $.post("${app}/view/show",{page:page,name:viewName,provinceId:viewProvince},function (result) {
                 var views = result.views;
                 var comments = result.comments;
+                if(views.length==0){
+                    alert("没有更多相关信息哦~~")
+                }
                 //console.log(views);
                 //console.log(comments)
+                var a = 1;
                 $.each(views,function (i, view) {
                     var div1 = $("<div class='clo-lg-10'/>");
                     $("#main").append(div1);
@@ -70,7 +74,7 @@
                     dl.append(dt);
                     var dd = $("<dd/>");
                     var a1 = $("<a target='_blank'/>").text(view.des);
-                    a1.attr("href","javascript:viewDetail("+view.id+")");
+                    a1.prop("href","javascript:viewDetail("+view.id+")");
                     dd.append(a1);
                     dl.append(dd);
                     var div7 = $("<div class='tn-extra'/>")
@@ -103,10 +107,13 @@
                     var form = $("<form/>");
                     div8.append(form);
                     var input = $("<input type='text' placeholder='追加评论'/>");
+                    input.attr("id",a);
                     var span5 = $("<span/>").text("       ");
                     form.append(input);
                     form.append(span5);
-                    var a3 = $("<a href='javascript:' class='btn-primary' style='background: rgb(0, 142, 173); padding: 7px 8px; border-radius: 4px; border: 1px solid rgb(26, 117, 152); border-image: none; color: rgb(255, 255, 255); font-weight: bold;width: 30px;'/>").text("--发送--");
+                    var a3 = $("<a class='btn-primary' style='background: rgb(0, 142, 173); padding: 7px 8px; border-radius: 4px; border: 1px solid rgb(26, 117, 152); border-image: none; color: rgb(255, 255, 255); font-weight: bold;width: 30px;'/>").text("--发送--");
+                    a3.attr("href","javascript:submitComment("+view.id+","+a+")");
+                    a++;
                     form.append(a3);
                     div1.append(hr);
                 })
@@ -121,7 +128,7 @@
                 */
                 var sli = $("<li/>");
                 $("#page").append(sli);
-                var sa = $("<a/>").attr("href","javascript:search("+pageNow-1+")");
+                var sa = $("<a/>").attr("href","javascript:search("+(pageNow-1)+")");
                 var s = $("<span/>").html("&laquo");
                 sa.append(s);
                 sli.append(sa);
@@ -132,7 +139,7 @@
                 }
                 var nli = $("<li/>");
                 $("#page").append(nli);
-                var na = $("<a/>").attr("href","javascript:search("+pageNow+1+")");
+                var na = $("<a/>").attr("href","javascript:search("+(pageNow+1)+")");
                 var n = $("<span/>").html("&raquo");
                 na.append(n);
                 nli.append(na);
@@ -151,6 +158,18 @@
             initData(page,name,provinceId);
         }
 
+        //提交评论
+        function submitComment(id,a){
+            var content = $("#"+a).val();
+            $.post("${app}/comment/save",{content:content,viewId:id},function (result) {
+                if(result.message){
+                    $("#main").empty()
+                    initData();
+                }else {
+                    alert("游客不能发表评论哦~~");
+                }
+            })
+        }
 
         $(function () {
 
@@ -176,45 +195,51 @@
             })
 
 
-            //监听模态框打开
+            //监听个人中心模态框打开
             $("#modUserInfo").on('show.bs.modal',function (e) {
-                $("#editForm")[0].reset();//重置表单
+                $("#userForm")[0].reset();//重置表单
                 $("#pro").empty();
                 $.post("${app}/user/mine",function (result) {
-                    //console.log(result.provinces);
-                    //console.log(result.user);
-                    var provinces = result.provinces;
-                    var user = result.user;
-                    $("#uid").val(user.id);
-                    $("#img").attr("src","${app}/userAvatars/"+user.avatar);
-                    $("#username").val(user.username);
-                    $("#pwd").val(user.password);
-                    if(user.sex == "男"){
-                        var sexOption1 = $("<option value='男' selected>男</option>");
-                        var sexOption2 = $("<option value='女'>女</option>");
-                        $("#sex").append(sexOption1);
-                        $("#sex").append(sexOption2);
-                    }
-                    if(user.sex == "女"){
-                        var sexOption1 = $("<option value='男'>男</option>");
-                        var sexOption2 = $("<option value='女' selected>女</option>");
-                        $("#sex").append(sexOption1);
-                        $("#sex").append(sexOption2);
-                    }
-                    $.each(provinces,function (i, province) {
-                        if(user.province.id == province.id){
-                            var proOption = $("<option value='"+province.id+"' selected>"+province.name+"</option>");
-                            $("#pro").append(proOption);
+                    if (result.message){
+                        //console.log(result.provinces);
+                        //console.log(result.user);
+                        var provinces = result.provinces;
+                        var user = result.user;
+                        $("#uid").val(user.id);
+                        $("#img").attr("src","${app}/userAvatars/"+user.avatar);
+                        $("#username").val(user.username);
+                        $("#pwd").val(user.password);
+                        if(user.sex == "男"){
+                            var sexOption1 = $("<option value='男' selected>男</option>");
+                            var sexOption2 = $("<option value='女'>女</option>");
+                            $("#sex").append(sexOption1);
+                            $("#sex").append(sexOption2);
                         }
-                        if(user.province.id != province.id){
-                            var proOption = $("<option value='"+province.id+"'>"+province.name+"</option>");
-                            $("#pro").append(proOption);
+                        if(user.sex == "女"){
+                            var sexOption1 = $("<option value='男'>男</option>");
+                            var sexOption2 = $("<option value='女' selected>女</option>");
+                            $("#sex").append(sexOption1);
+                            $("#sex").append(sexOption2);
                         }
-                    });
-                    $("#phone").val(user.phone);
-                    $("#email").val(user.email);
+                        $.each(provinces,function (i, province) {
+                            if(user.province.id == province.id){
+                                var proOption = $("<option value='"+province.id+"' selected>"+province.name+"</option>");
+                                $("#pro").append(proOption);
+                            }
+                            if(user.province.id != province.id){
+                                var proOption = $("<option value='"+province.id+"'>"+province.name+"</option>");
+                                $("#pro").append(proOption);
+                            }
+                        });
+                        $("#phone").val(user.phone);
+                        $("#email").val(user.email);
+                    } else {
+                        $("#modUserInfo").modal('hide');
+                        alert("您还未登录哦~~");
+                    }
                 })
             })
+
             //提交修改
             $("#userInfo").click(function () {
                 $.post("${app}/user/update",$("#userForm").serialize(),function (result) {
@@ -228,79 +253,119 @@
                 })
             });
 
+            //监听发布信息模态框打开
+            $("#modViewInfo").on('show.bs.modal',function (e) {
+                $("#editForm")[0].reset();//重置表单
+                $("#pd").empty();
+                $.post("${app}/view/queryAllProvince",function (result) {
+                    var provinces = result.provinces;
+                    $.each(provinces,function (i, province) {
+                        var option = $("<option value='"+province.id+"'>"+province.name+"</option>");
+                        $("#pd").append(option);
+                    })
+                })
+            });
+            //发布信息
+            $("#editViewInfo").click(function () {
+                var formData = new FormData($("#editForm")[0]);
+                $.ajax({
+                    type:"post",
+                    url:"${app}/view/addView",
+                    data:formData,
+                    cache: false,
+                    async: false,
+                    processData : false,
+                    contentType : false,
+                    success:function (result) {
+                        if(result.message){
+                            //隐藏模态框
+                            $("#modViewInfo").modal("hide");
+                            initData();
+                        }else {
+                            $("#modViewInfo").modal("hide");
+                            alert("游客不能发布信息哦~~");
+                        }
+                    }
+                })
+            });
         });
+
 
         //与我相关
         function myView(page) {
             $.post("${app}/view/myView",{page:page},function (result) {
-                $("#main").empty();
-                var views = result.views;
-                var comments = result.comments;
-                //console.log(views);
-                //console.log(comments)
-                $.each(views,function (i, view) {
-                    var div1 = $("<div class='clo-lg-10'/>");
-                    $("#main").append(div1);
-                    var div2 = $("<div class='tn-list'/>");
-                    div1.append(div2);
-                    var div3 = $("<div class='tn-item clearfix'/>");
-                    div2.append(div3);
-                    var div4 = $("<div style='height: 10px'/>");
-                    div3.append(div4);
-                    var div5 = $("<div class='col-md-4'>");
-                    var img1 = $("<img width='220px' height='150px'>").attr("src","${app}/uploadViews/"+view.picture);
-                    div5.append(img1);
-                    div3.append(div5);
-                    var div6 = $("<div class='col-md-6'>");
-                    div3.append(div6);
-                    var dl = $("<dl/>");
-                    div6.append(dl);
-                    var dt = $("<dt/>").text(view.name);
-                    dl.append(dt);
-                    var dd = $("<dd/>");
-                    var a1 = $("<a target='_blank'/>").text(view.des);
-                    a1.attr("href","javascript:viewDetail("+view.id+")");
-                    dd.append(a1);
-                    dl.append(dd);
-                    var div7 = $("<div class='tn-extra'/>")
-                    div6.append(div7);
-                    var span1 = $("<span class='tn-place'/>");
-                    div7.append(span1)
-                    var span2 = $("<span class='glyphicon glyphicon-map-marker' rel='nofollow'/>").text(view.province.name+", by: ");
-                    span1.append(span2);
-                    var span3 = $("<span class='tn-user'/>");
-                    div7.append(span3);
-                    var a2 = $("<a target='_blank' rel='nofollow'/>");
-                    span3.append(a2);
-                    var img2 = $("<img width='30px' height='16px'/>").attr("src","${app}/userAvatars/"+view.user.avatar);
-                    a2.append(img2);
-                    var span4 = $("<span/>").text("     "+view.user.username);
-                    a2.append(span4);
-                    var hr = $("<hr/>");
-                    //div7.append(hr);
-                    var div8 = $("<div class='col-md-6'/>")
-                    div3.append(div8);
-                    var h = $("<h3/>").text("评论区")
-                    div8.append(h);
-                    $.each(comments,function (i, comment) {
-                        if(comment.view.id==view.id){
-                            var span5 = $("<span/><br>").text(comment.user.username+" : "+comment.content);
-                            div8.append(span5);
-                        }
-                    });
-                    //div8.append(hr);
-                    var form = $("<form/>");
-                    div8.append(form);
-                    var input = $("<input type='text' placeholder='追加评论'/>");
-                    var span5 = $("<span/>").text("       ");
-                    form.append(input);
-                    form.append(span5);
-                    var a3 = $("<a href='javascript:' class='btn-primary' style='background: rgb(0, 142, 173); padding: 7px 8px; border-radius: 4px; border: 1px solid rgb(26, 117, 152); border-image: none; color: rgb(255, 255, 255); font-weight: bold;width: 30px;'/>").text("--发送--");
-                    form.append(a3);
-                    div1.append(hr);
-                })
-                //清除上一页、下一页
-                $("#page").empty();
+                if(result.message){
+                    $("#main").empty();
+                    var views = result.views;
+                    var comments = result.comments;
+                    //console.log(views);
+                    //console.log(comments)
+                    $.each(views,function (i, view) {
+                        var div1 = $("<div class='clo-lg-10'/>");
+                        $("#main").append(div1);
+                        var div2 = $("<div class='tn-list'/>");
+                        div1.append(div2);
+                        var div3 = $("<div class='tn-item clearfix'/>");
+                        div2.append(div3);
+                        var div4 = $("<div style='height: 10px'/>");
+                        div3.append(div4);
+                        var div5 = $("<div class='col-md-4'>");
+                        var img1 = $("<img width='220px' height='150px'>").attr("src","${app}/uploadViews/"+view.picture);
+                        div5.append(img1);
+                        div3.append(div5);
+                        var div6 = $("<div class='col-md-6'>");
+                        div3.append(div6);
+                        var dl = $("<dl/>");
+                        div6.append(dl);
+                        var dt = $("<dt/>").text(view.name);
+                        dl.append(dt);
+                        var dd = $("<dd/>");
+                        var a1 = $("<a target='_blank'/>").text(view.des);
+                        a1.attr("href","javascript:viewDetail("+view.id+")");
+                        dd.append(a1);
+                        dl.append(dd);
+                        var div7 = $("<div class='tn-extra'/>")
+                        div6.append(div7);
+                        var span1 = $("<span class='tn-place'/>");
+                        div7.append(span1)
+                        var span2 = $("<span class='glyphicon glyphicon-map-marker' rel='nofollow'/>").text(view.province.name+", by: ");
+                        span1.append(span2);
+                        var span3 = $("<span class='tn-user'/>");
+                        div7.append(span3);
+                        var a2 = $("<a target='_blank' rel='nofollow'/>");
+                        span3.append(a2);
+                        var img2 = $("<img width='30px' height='16px'/>").attr("src","${app}/userAvatars/"+view.user.avatar);
+                        a2.append(img2);
+                        var span4 = $("<span/>").text("     "+view.user.username);
+                        a2.append(span4);
+                        var hr = $("<hr/>");
+                        //div7.append(hr);
+                        var div8 = $("<div class='col-md-6'/>")
+                        div3.append(div8);
+                        var h = $("<h3/>").text("评论区")
+                        div8.append(h);
+                        $.each(comments,function (i, comment) {
+                            if(comment.view.id==view.id){
+                                var span5 = $("<span/><br>").text(comment.user.username+" : "+comment.content);
+                                div8.append(span5);
+                            }
+                        });
+                        //div8.append(hr);
+                        var form = $("<form/>");
+                        div8.append(form);
+                        var input = $("<input type='text' placeholder='追加评论'/>");
+                        var span5 = $("<span/>").text("       ");
+                        form.append(input);
+                        form.append(span5);
+                        var a3 = $("<a href='javascript:' class='btn-primary' style='background: rgb(0, 142, 173); padding: 7px 8px; border-radius: 4px; border: 1px solid rgb(26, 117, 152); border-image: none; color: rgb(255, 255, 255); font-weight: bold;width: 30px;'/>").text("--发送--");
+                        form.append(a3);
+                        div1.append(hr);
+                    })
+                    //清除上一页、下一页
+                    $("#page").empty();
+                }else {
+                    alert("您还未登录哦~~");
+                }
             });
         }
 
@@ -429,8 +494,13 @@
         <!--左栏-->
         <div class="col-md-2" id="im">
 
-            <ul class="list-group">
-                <a >欢迎:<img width="30px" height="20px" src="${app}/userAvatars/${sessionScope.user.avatar}">&nbsp;&nbsp;${sessionScope.user.username}</a>
+            <ul class="show-nav">
+                <c:if test="${sessionScope.user ne null}">
+                    <span>欢迎:<img width="30px" height="20px" src="${app}/userAvatars/${sessionScope.user.avatar}">&nbsp;&nbsp;${sessionScope.user.username}</span>
+                </c:if>
+                <c:if test="${sessionScope.user eq null}">
+                    <a class="btn btn-warning" href="${app}/register.jsp">前往注册</a>
+                </c:if>
             </ul>
 
 
@@ -439,7 +509,7 @@
 
         <div class="col-lg-10">
             <div class="page-header">
-                <h1>首页</h1>
+                <h1>要玩的开心哦~</h1>
             </div>
             <!--搜索框-->
             <div class="panel panel-default">
@@ -452,10 +522,10 @@
                         <div class="form-group">
                             <label for="viewProvince">景点所在地</label>
                             <select class="form-control" id="viewProvince">
-                                <option>---请选择景点所在地---</option>
+                                <option value="">--请选择景点所在地--</option>
                             </select>
                         </div>
-                        <button class="btn btn-primary" id="selectBtn" onclick="javascript:search(1);">查询</button>
+                        <button type="button" class="btn btn-primary" onclick="javascript:search(1);">查询</button>
                     </form>
                 </div>
             </div>
@@ -559,8 +629,6 @@
             </div>
             <div class="modal-body">
                 <form  id="editForm" class="form-horizontal" enctype="multipart/form-data" method="post">
-                    <input type="hidden" name="id" id="id"/>
-
                     <div class="form-group">
                         <label class="control-label col-xs-2">景点名称</label>
                         <div class="col-xs-8">
@@ -582,19 +650,19 @@
                     <div class="form-group">
                         <label class="control-label col-xs-2">景点所在地</label>
                         <div class="col-xs-8">
-                            <select name="provinceId" id="pd" style="width: 100px">
-                                <option value="">北京</option>
+                            <select name="province.id" id="pd" style="width: 150px">
+
                             </select>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="control-label col-xs-2">星级</label>
                         <div class="col-xs-8">
-                            <input name="sign" type="radio" checked="checked"/>一星
-                            <input name="sign" type="radio" />二星
-                            <input name="sign" type="radio" />三星
-                            <input name="sign" type="radio" />四星
-                            <input name="sign" type="radio" />五星
+                            <input name="score" type="radio" value="一星" checked="checked"/>一星
+                            <input name="score" type="radio" value="二星"/>二星
+                            <input name="score" type="radio" value="三星"/>三星
+                            <input name="score" type="radio" value="四星"/>四星
+                            <input name="score" type="radio" value="五星"/>五星
                         </div>
                     </div>
 

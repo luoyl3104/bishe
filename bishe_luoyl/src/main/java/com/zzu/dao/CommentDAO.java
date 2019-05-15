@@ -16,4 +16,7 @@ public interface CommentDAO extends Mapper<Comment> {
 
     //根据view_id查
     public List<Comment> selectByViewId(String viewId);
+
+    //添加评论
+    public void insertComment(Comment comment);
 }

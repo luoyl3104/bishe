@@ -14,4 +14,6 @@ public interface ViewDAO extends Mapper<View> {
 
     public List<View> selectByUsername(@Param("start") Integer start,@Param("rows") Integer rows,@Param("username") String username);
 
+    public void insertView(View view);
+
 }

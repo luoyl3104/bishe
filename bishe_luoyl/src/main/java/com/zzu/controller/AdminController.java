@@ -42,6 +42,6 @@ public class AdminController {
     @RequestMapping("exit")
     public String exit(HttpSession session){
         session.invalidate();
-        return "login";
+        return "adminLogin";
     }
 }

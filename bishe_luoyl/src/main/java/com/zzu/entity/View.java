@@ -23,7 +23,7 @@ public class View implements Serializable {
 
     private String picture;
 
-    private Integer score;
+    private String score;
 
     private String path;
 
