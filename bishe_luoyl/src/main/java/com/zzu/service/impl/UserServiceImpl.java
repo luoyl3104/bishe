@@ -26,8 +26,8 @@ public class UserServiceImpl implements UserService {
 
     @Transactional(propagation = Propagation.SUPPORTS)
     @Override
-    public List<User> findByPage(Integer start, Integer rows) {
-        return userDAO.selectByPage(start,rows);
+    public List<User> findByPage(User user,Integer start, Integer rows) {
+        return userDAO.selectByPage(user,start,rows);
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
@@ -54,7 +54,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public void register(User user) {
         user.setType("激活");
-        user.setId(UUID.randomUUID().toString());
+        int i = new Random().nextInt();
+        String id =""+Math.abs(i);
+        user.setId(id);
         user.setRegistDate(new Date());
         userDAO.insertUser(user);
     }
@@ -62,7 +64,13 @@ public class UserServiceImpl implements UserService {
     //用于回显
     @Override
     public User findOne(User user) {
-       return userDAO.selectByUsername(user.getUsername());
+       return userDAO.selectById(user.getId());
+    }
+
+    @Override
+    public User findById(String id) {
+        User user = userDAO.selectByPrimaryKey(id);
+        return user;
     }
 
     @Override
@@ -105,6 +113,10 @@ public class UserServiceImpl implements UserService {
             map.put("update",false);
         }else {
             userDAO.updateUser(user);
+            User byId = userDAO.selectById(user.getId());
+            HttpSession session = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getSession();
+            session.removeAttribute("user");
+            session.setAttribute("user",byId);
             map.put("update",true);
         }
         return map;

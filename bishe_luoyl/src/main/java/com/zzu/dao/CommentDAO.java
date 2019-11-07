@@ -9,7 +9,7 @@ import java.util.List;
 public interface CommentDAO extends Mapper<Comment> {
 
     //查询所有评论
-    public List<Comment> selectByPage(@Param("start") Integer start,@Param("rows") Integer rows);
+    public List<Comment> selectByPage(@Param("comment")Comment comment,@Param("start") Integer start,@Param("rows") Integer rows);
 
     //无参数查所有
     public List<Comment> selectAllComment();
@@ -19,4 +19,7 @@ public interface CommentDAO extends Mapper<Comment> {
 
     //添加评论
     public void insertComment(Comment comment);
+
+    //删除信息时删除评论
+    public void deleteByViewId(String id);
 }

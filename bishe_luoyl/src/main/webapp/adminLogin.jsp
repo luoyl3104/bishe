@@ -115,7 +115,7 @@
 					  <tr>
 						  <td>&nbsp;</td>
 							<th>
-								<label for="password">密&nbsp;&nbsp;&nbsp;码:</label>
+								<label for="password">密&nbsp;&nbsp;码:</label>
 							</th>
 							<td>
 								<input type="password" id="password" name="password"  maxlength="20" autocomplete="off"/>
@@ -151,7 +151,9 @@
 						</td>
 					</tr>
 				</tbody></table>
-				<div class="powered">zzu.luoyulong@3104651846@qq.com</div>
+				<div style="text-align:center;padding-top: 30px">
+					zzu.luoyulong © 2019  3104651846@qq.com
+				</div>
 			</form>
 		</div>
 </body>

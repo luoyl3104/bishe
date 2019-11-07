@@ -1,5 +1,6 @@
 package com.zzu.service.impl;
 
+import com.zzu.dao.CommentDAO;
 import com.zzu.dao.ViewDAO;
 import com.zzu.entity.User;
 import com.zzu.entity.View;
@@ -14,6 +15,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 @Service
@@ -22,6 +24,9 @@ public class ViewServiceImpl implements ViewService {
 
     @Resource
     private ViewDAO viewDAO;
+
+    @Resource
+    private CommentDAO commentDAO;
 
     @Transactional(propagation = Propagation.SUPPORTS)
     @Override
@@ -49,7 +54,7 @@ public class ViewServiceImpl implements ViewService {
 
     @Override
     public void addView(View view) {
-        view.setId(String.valueOf(new Date().getTime()));
+        view.setId(""+Math.abs(new Random().nextInt()));
         view.setUploadDate(new Date());
         view.setType("开放");
         viewDAO.insertView(view);
@@ -58,6 +63,7 @@ public class ViewServiceImpl implements ViewService {
     @Override
     public void removeView(String id) {
         viewDAO.deleteByPrimaryKey(id);
+        commentDAO.deleteByViewId(id);
     }
 
     @Override

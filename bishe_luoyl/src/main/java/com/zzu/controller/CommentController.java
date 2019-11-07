@@ -31,15 +31,17 @@ public class CommentController {
     }
 
     @RequestMapping("queryByPage")
-    public Map<String,Object> queryByPage(Integer page,Integer rows){
+    public Map<String,Object> queryByPage(Integer page,Comment comment){
         HashMap<String, Object> map = new HashMap<>();
+        Integer rows = 10;
+        page = page == null?1:page;
         Integer start = (page-1)*rows;
-        List<Comment> comments = commentService.findByPage(start, rows);
+        List<Comment> comments = commentService.findByPage(comment,start, rows);
         Long total = commentService.findTotal();
         Long pageTotal = total%rows==0?total/rows:total/rows+1;
-        map.put("rows",comments);
-        map.put("records",total);
-        map.put("total",pageTotal);
+        map.put("comments",comments);
+        map.put("totals",total);
+        map.put("pageTotal",pageTotal);
         map.put("page",page);
         return map;
     }

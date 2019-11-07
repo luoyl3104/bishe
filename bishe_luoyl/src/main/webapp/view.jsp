@@ -4,47 +4,94 @@
 <script>
     $(function () {
 
-        //创建表格
-        $("#viewTable").jqGrid({
-            styleUI : 'Bootstrap',
-            autowidth:true,
-            url:"${app}/view/queryView",
-            datatype:"json",
-            rowNum:3,
-            pager:"#pager",
-            viewrecords:true,
-            colNames:["id","景点名称","星级","景点描述","景点图片","所在地","信息状态","图片存储路径","上传时间","上传者","操作"],
-            colModel:[
-                {name:"id", hidden:true},
-                {name:"name"},
-                {name:"score"},
-                {name:"des",editable:true},
-                {name:"picture",formatter:function(value,options,row){
-                        var temp = "<img class='img-rounded' width='50px' height='30px' src='${app}/uploadViews/"
-                        return temp + row.picture +"'/>"
-                    }},
-                {name:"province.name"},
-                {name:"type",editable:true},
-                {name:"path"},
-                {name:"uploadDate"},
-                {name:"user.username"},
-                {name:"options",
-                    formatter:function(value,options,row){
-                        var content = " <a onclick=\"javasctipt:show(\'"+row.id+"'\)\"><span class=\"glyphicon glyphicon-search\" aria-hidden=\"true\"></span></a>   "+
-                            "<a data-toggle='modal' onclick=\"javascript:edit(\'"+row.id+"'\,\'"+row.type+"'\)\"><span class=\"glyphicon glyphicon-pencil\" aria-hidden=\"true\"></span></a>  "+
-                            "<a onclick=\"javascript:del(\'"+row.id+"'\)\"><span class=\"glyphicon glyphicon-remove\" aria-hidden=\"true\"></span></a>";
-                        return content;
-                    }
-                }
-            ]
-        }).jqGrid();
+        initData();
+
+        $.post("${app}/view/queryAllProvince",function (result) {
+            var provinces = result.provinces;
+            $.each(provinces,function (i, province) {
+                var option = $("<option value='"+province.id+"'/>").text(province.name);
+                $("#viewProvince").append(option);
+            })
+        })
+
 
     });
+
+
+    function initData(page,name,provinceId) {
+        $.post("${app}/view/queryView",{page:page,name:name,provinceId:provinceId},function (result) {
+            $("#tbody").empty();
+            $("#pager").empty();
+            var views = result.views;
+            if(views.length == 0){
+                alert("没有检索到结果哦~！");
+            }else {
+                //console.log(users);
+                $.each(views,function (i, view) {
+                    var tr = $("<tr/>");
+                    var img = $("<img class='img-rounded' align='center' width='50px' height='30px'>").attr("src","${app}/uploadViews/"+view.picture);
+                    var avatarTd = $("<td/>").html(img);
+                    var nameTd = $("<td/>").text(view.name);
+                    var pwdTd = $("<td width='300px'/>").text(view.des);
+                    var typeTd = $("<td/>").text(view.type);
+                    var sexTd = $("<td/>").text(view.province.name);
+                    var phoneTd = $("<td/>").text(view.user.username);
+                    var emailTd = $("<td/>").text(view.uploadDate);
+                    var optionTd = $("<td/>");
+                    var editBtn = $("<button onclick='javascript:edit("+view.id+")'/>").addClass("btn btn-warning");
+                    var editSpan = $("<span class='glyphicon glyphicon-pencil' aria-hidden='true'/>");
+                    editBtn.html(editSpan);
+                    var delBtn = $("<button onclick='javascript:del("+view.id+")'/>").addClass("btn btn-danger");
+                    var delSpan = $("<span class='glyphicon glyphicon-remove' aria-hidden='true'/>");
+                    delBtn.html(delSpan);
+                    var showBtn = $("<button onclick='javascript:show("+view.id+")'/>").addClass("btn btn-primary");
+                    var showSpan = $("<span class='glyphicon glyphicon-search' aria-hidden='true'/>");
+                    showBtn.html(showSpan);
+                    optionTd.append(editBtn).append("&nbsp;").append(delBtn).append("&nbsp;").append(showBtn);
+                    tr.append(avatarTd).append(nameTd).append(pwdTd).append(typeTd).append(sexTd).append(phoneTd).append(emailTd).append(optionTd);
+                    $("#tbody").append(tr);
+                });
+
+                //创建页数
+                var totalPage = result.pageTotal;
+                var pageNow = result.page;
+                //生成上一页
+                var s = $("<li/>");
+                var ss = $("<a/>").attr("href","javascript:search("+(pageNow-1)+");");
+                var a = $("<span/>").html("&laquo");
+                ss.append(a);
+                s.append(ss);
+                //添加到页面
+                $("#pager").append(s);
+                //上一页状态
+                if (pageNow==1){
+                    s.addClass("disabled");
+                    ss.removeAttr("href");
+                }
+                //生成下一页
+                var nextPage = $("<li/>");
+                var nextPagea = $("<a/>").attr("href","javascript:search("+(pageNow+1)+");");
+                var nextPages = $("<span/>").html("&raquo");
+                nextPagea.append(nextPages);
+                nextPage.append(nextPagea);
+                //添加到页面
+                $("#pager").append(nextPage);
+                //下一页状态
+                if (pageNow==totalPage){
+                    nextPage.addClass("disabled");
+                    nextPagea.removeAttr("href");
+                }
+            }
+
+        },"JSON");
+    }
+
 
     //删除
     function del(id) {
         $.post("${app}/view/remove",{id:id},function () {
-            $("#viewTable").jqGrid().trigger("reloadGrid");
+            alert("删除成功！");
+            initData();
         })
     }
 
@@ -67,13 +114,17 @@
     }
 
     //修改状态
-    function edit(id,type) {
-        $.post("${app}/view/updateType",{id:id,type:type},function () {
-            $("#viewTable").jqGrid().trigger("reloadGrid");
+    function edit(id) {
+        $.post("${app}/view/updateType",{id:id},function () {
+            initData();
         })
     }
 
-
+    function search(page) {
+        var name = $("#name").val();
+        var provinceId = $("#viewProvince").val();
+        initData(page,name,provinceId);
+    }
 
 
 
@@ -87,12 +138,52 @@
 </ul>
 
 <div class="panel panel-default">
+
+    <%--搜索框--%>
+    <div class="panel-body">
+        <div class="col-sm-10 col-sm-offset-2">
+            <form class="form-inline">
+                <div class="form-group">
+                    <label for="name">景点名称</label>
+                    <input type="text" class="form-control" id="name" placeholder="景点名称中关键字即可">
+                </div>
+                <div class="form-group">
+                    <label for="viewProvince" class="control-label">景点所在地</label>
+                    <select name="status" class="form-control" id="viewProvince">
+                        <option value="">----------请选择----------</option>
+                    </select>
+                </div>
+                <button type="button" class="btn btn-primary " onclick="javascript:search();">查询</button>
+            </form>
+        </div>
+    </div>
+
     <!--表-->
     <table class="table table-bordered table-striped" id="viewTable">
+        <thead>
+        <tr>
+            <th>景点图片</th>
+            <th>景点名称</th>
+            <th>景点描述</th>
+            <th>景点状态</th>
+            <th>景点所在地</th>
+            <th>信息发布者</th>
+            <th>信息发布时间</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody id="tbody">
+
+        </tbody>
     </table>
 </div>
 <!--分页-->
-<div id="pager" style="height: 50px"></div>
+<nav aria-label="Page navigation" class="pull-right">
+    <ul class="pagination" id="pager">
+
+    </ul>
+</nav>
+
 <div class="clearfix"></div>
 
 
@@ -133,7 +224,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="control-label col-xs-2">景点分数</label>
+                        <label class="control-label col-xs-2">景点星级</label>
                         <div class="col-xs-8">
                             <input type="text" id="score" class="form-control">
                         </div>

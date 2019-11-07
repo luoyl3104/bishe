@@ -50,9 +50,6 @@
                 if(views.length==0){
                     alert("没有更多相关信息哦~~")
                 }
-                //console.log(views);
-                //console.log(comments)
-                var a = 1;
                 $.each(views,function (i, view) {
                     var div1 = $("<div class='clo-lg-10'/>");
                     $("#main").append(div1);
@@ -90,31 +87,13 @@
                     var img2 = $("<img width='30px' height='16px'/>").attr("src","${app}/userAvatars/"+view.user.avatar);
                     a2.append(img2);
                     var span4 = $("<span/>").text("     "+view.user.username);
+                    var span5 = $("<span/>").text("     星级:"+view.score);
+                    span3.append(span5);
+                    var span6 = $("<span/>").text("     状态:"+view.type);
+                    span3.append(span6);
                     a2.append(span4);
                     var hr = $("<hr/>");
                     //div7.append(hr);
-                    var div8 = $("<div class='col-md-6'/>")
-                    div3.append(div8);
-                    var h = $("<h3/>").text("评论区")
-                    div8.append(h);
-                    $.each(comments,function (i, comment) {
-                        if(comment.view.id==view.id){
-                            var span5 = $("<span/><br>").text(comment.user.username+" : "+comment.content);
-                            div8.append(span5);
-                        }
-                    });
-                    //div8.append(hr);
-                    var form = $("<form/>");
-                    div8.append(form);
-                    var input = $("<input type='text' placeholder='追加评论'/>");
-                    input.attr("id",a);
-                    var span5 = $("<span/>").text("       ");
-                    form.append(input);
-                    form.append(span5);
-                    var a3 = $("<a class='btn-primary' style='background: rgb(0, 142, 173); padding: 7px 8px; border-radius: 4px; border: 1px solid rgb(26, 117, 152); border-image: none; color: rgb(255, 255, 255); font-weight: bold;width: 30px;'/>").text("--发送--");
-                    a3.attr("href","javascript:submitComment("+view.id+","+a+")");
-                    a++;
-                    form.append(a3);
                     div1.append(hr);
                 })
                 //生成上一页、下一页
@@ -122,10 +101,6 @@
                 //console.log(result.pageNow);
                 var pageNow = result.pageNow;
                 var pageTotal = result.pageTotal;
-                /*
-                  <li><a href="#">Previous</a></li>
-                  <li><a href="#">Next</a></li>
-                */
                 var sli = $("<li/>");
                 $("#page").append(sli);
                 var sa = $("<a/>").attr("href","javascript:search("+(pageNow-1)+")");
@@ -163,8 +138,7 @@
             var content = $("#"+a).val();
             $.post("${app}/comment/save",{content:content,viewId:id},function (result) {
                 if(result.message){
-                    $("#main").empty()
-                    initData();
+                    viewDetail(id);
                 }else {
                     alert("游客不能发表评论哦~~");
                 }
@@ -247,6 +221,7 @@
                         alert("修改个人信息成功~！");
                         //关闭模态框
                         $("#modUserInfo").modal('hide');
+                        $("#user").text("${sessionScope.user.username}");
                     }else {
                         alert("用户名已存在，请重新修改~！");
                     }
@@ -291,78 +266,90 @@
         });
 
 
-        //与我相关
+        //我的足迹
         function myView(page) {
             $.post("${app}/view/myView",{page:page},function (result) {
                 if(result.message){
-                    $("#main").empty();
                     var views = result.views;
                     var comments = result.comments;
-                    //console.log(views);
-                    //console.log(comments)
-                    $.each(views,function (i, view) {
-                        var div1 = $("<div class='clo-lg-10'/>");
-                        $("#main").append(div1);
-                        var div2 = $("<div class='tn-list'/>");
-                        div1.append(div2);
-                        var div3 = $("<div class='tn-item clearfix'/>");
-                        div2.append(div3);
-                        var div4 = $("<div style='height: 10px'/>");
-                        div3.append(div4);
-                        var div5 = $("<div class='col-md-4'>");
-                        var img1 = $("<img width='220px' height='150px'>").attr("src","${app}/uploadViews/"+view.picture);
-                        div5.append(img1);
-                        div3.append(div5);
-                        var div6 = $("<div class='col-md-6'>");
-                        div3.append(div6);
-                        var dl = $("<dl/>");
-                        div6.append(dl);
-                        var dt = $("<dt/>").text(view.name);
-                        dl.append(dt);
-                        var dd = $("<dd/>");
-                        var a1 = $("<a target='_blank'/>").text(view.des);
-                        a1.attr("href","javascript:viewDetail("+view.id+")");
-                        dd.append(a1);
-                        dl.append(dd);
-                        var div7 = $("<div class='tn-extra'/>")
-                        div6.append(div7);
-                        var span1 = $("<span class='tn-place'/>");
-                        div7.append(span1)
-                        var span2 = $("<span class='glyphicon glyphicon-map-marker' rel='nofollow'/>").text(view.province.name+", by: ");
-                        span1.append(span2);
-                        var span3 = $("<span class='tn-user'/>");
-                        div7.append(span3);
-                        var a2 = $("<a target='_blank' rel='nofollow'/>");
-                        span3.append(a2);
-                        var img2 = $("<img width='30px' height='16px'/>").attr("src","${app}/userAvatars/"+view.user.avatar);
-                        a2.append(img2);
-                        var span4 = $("<span/>").text("     "+view.user.username);
-                        a2.append(span4);
-                        var hr = $("<hr/>");
-                        //div7.append(hr);
-                        var div8 = $("<div class='col-md-6'/>")
-                        div3.append(div8);
-                        var h = $("<h3/>").text("评论区")
-                        div8.append(h);
-                        $.each(comments,function (i, comment) {
-                            if(comment.view.id==view.id){
-                                var span5 = $("<span/><br>").text(comment.user.username+" : "+comment.content);
-                                div8.append(span5);
-                            }
-                        });
-                        //div8.append(hr);
-                        var form = $("<form/>");
-                        div8.append(form);
-                        var input = $("<input type='text' placeholder='追加评论'/>");
-                        var span5 = $("<span/>").text("       ");
-                        form.append(input);
-                        form.append(span5);
-                        var a3 = $("<a href='javascript:' class='btn-primary' style='background: rgb(0, 142, 173); padding: 7px 8px; border-radius: 4px; border: 1px solid rgb(26, 117, 152); border-image: none; color: rgb(255, 255, 255); font-weight: bold;width: 30px;'/>").text("--发送--");
-                        form.append(a3);
-                        div1.append(hr);
-                    })
-                    //清除上一页、下一页
-                    $("#page").empty();
+                    if(views.length==0){
+                        alert("您还没有留下过足迹哦~！");
+                    }else {
+                        $("#main").empty();
+                        //console.log(views);
+                        //console.log(comments)
+                        $.each(views,function (i, view) {
+                            var div1 = $("<div class='clo-lg-10'/>");
+                            $("#main").append(div1);
+                            var div2 = $("<div class='tn-list'/>");
+                            div1.append(div2);
+                            var div3 = $("<div class='tn-item clearfix'/>");
+                            div2.append(div3);
+                            var div4 = $("<div style='height: 10px'/>");
+                            div3.append(div4)
+                            var div5 = $("<div class='col-md-4'>");
+                            var img1 = $("<img width='220px' height='150px'>").attr("src","${app}/uploadViews/"+view.picture);
+                            div5.append(img1);
+                            div3.append(div5);
+                            var div6 = $("<div class='col-md-6'>");
+                            div3.append(div6);
+                            var dl = $("<dl/>");
+                            div6.append(dl);
+                            var dt = $("<dt/>").text(view.name);
+                            var btn = $("       "+"<button class='btn-danger'>删除</button>");
+                            btn.attr("onclick","javascript:del("+view.id+")");
+                            dt.append(btn);
+                            div3.append(div4);
+                            dl.append(dt);
+                            var dd = $("<dd/>");
+                            var a1 = $("<a target='_blank'/>").text(view.des);
+                            a1.attr("href","javascript:viewDetail("+view.id+")");
+                            dd.append(a1);
+                            dl.append(dd);
+                            var div7 = $("<div class='tn-extra'/>")
+                            div6.append(div7);
+                            var span1 = $("<span class='tn-place'/>");
+                            div7.append(span1)
+                            var span2 = $("<span class='glyphicon glyphicon-map-marker' rel='nofollow'/>").text(view.province.name+", by: ");
+                            span1.append(span2);
+                            var span3 = $("<span class='tn-user'/>");
+                            div7.append(span3);
+                            var a2 = $("<a target='_blank' rel='nofollow'/>");
+                            span3.append(a2);
+                            var img2 = $("<img width='30px' height='16px'/>").attr("src","${app}/userAvatars/"+view.user.avatar);
+                            a2.append(img2);
+                            var span4 = $("<span/>").text("     "+view.user.username);
+                            a2.append(span4);
+                            var span5 = $("<span/>").text("     星级:"+view.score);
+                            span3.append(span5);
+                            var span6 = $("<span/>").text("     状态:"+view.type);
+                            span3.append(span6);
+                            var hr = $("<hr/>");
+                            //div7.append(hr);
+                            var div8 = $("<div class='col-md-6'/>")
+                            div3.append(div8);
+                            var h = $("<h3/>").text("评论区")
+                            div8.append(h);
+                            $.each(comments,function (i, comment) {
+                                if(comment.view.id==view.id){
+                                    var span5 = $("<span/><br>").text("-"+comment.publishDate+"-"+comment.user.username+" : "+comment.content);
+                                    div8.append(span5);
+                                }
+                            });
+                            //div8.append(hr);
+                            var form = $("<form/>");
+                            div8.append(form);
+                            var input = $("<input type='text' placeholder='追加评论'/>");
+                            var span5 = $("<span/>").text("       ");
+                            form.append(input);
+                            form.append(span5);
+                            var a3 = $("<a href='javascript:' class='btn-primary' style='background: rgb(0, 142, 173); padding: 7px 8px; border-radius: 4px; border: 1px solid rgb(26, 117, 152); border-image: none; color: rgb(255, 255, 255); font-weight: bold;width: 30px;'/>").text("--发送--");
+                            form.append(a3);
+                            div1.append(hr);
+                        })
+                        //清除上一页、下一页
+                        $("#page").empty();
+                    }
                 }else {
                     alert("您还未登录哦~~");
                 }
@@ -372,6 +359,7 @@
         //展示详情
         function viewDetail(id) {
             $.post("${app}/view/viewDetail",{viewId:id},function (result) {
+                var a = 1;
                 $("#main").empty();
                 var view = result.view;
                 var comments = result.comments;
@@ -413,6 +401,10 @@
                 a2.append(img2);
                 var span4 = $("<span/>").text("     "+view.user.username);
                 a2.append(span4);
+                var span5 = $("<span/>").text("    星级:"+view.score);
+                span3.append(span5);
+                var span6 = $("<span/>").text("     状态:"+view.type);
+                span3.append(span6);
                 var hr = $("<hr/>");
                 //div7.append(hr);
                 var div8 = $("<div class='col-md-6'/>")
@@ -420,20 +412,33 @@
                 var h = $("<h3/>").text("评论区")
                 div8.append(h);
                 $.each(comments,function (i, comment) {
-                    var span5 = $("<span/><br>").text(comment.user.username+" : "+comment.content);
-                    div8.append(span5);
+                    if(comment.view.id==view.id){
+                        var span5 = $("<span/><br>").text("-"+comment.publishDate+"-"+comment.user.username+" : "+comment.content);
+                        div8.append(span5);
+                    }
                 });
+                //div8.append(hr);
                 var form = $("<form/>");
                 div8.append(form);
-                var input = $("<input type='text' placeholder='追加评论'/>");
+                var input = $("<input type='text' placeholder='追加评论' id='a'/>");
+                input.attr("id",a);
                 var span5 = $("<span/>").text("       ");
                 form.append(input);
                 form.append(span5);
-                var a3 = $("<a href='javascript:' class='btn-primary' style='background: rgb(0, 142, 173); padding: 7px 8px; border-radius: 4px; border: 1px solid rgb(26, 117, 152); border-image: none; color: rgb(255, 255, 255); font-weight: bold;width: 30px;'/>").text("--发送--");
+                var a3 = $("<a class='btn-primary' style='background: rgb(0, 142, 173); padding: 7px 8px; border-radius: 4px; border: 1px solid rgb(26, 117, 152); border-image: none; color: rgb(255, 255, 255); font-weight: bold;width: 30px;'/>").text("--发送--");
+                a3.attr("href","javascript:submitComment("+view.id+","+a+")");
                 form.append(a3);
                 div1.append(hr);
                 //清除上一页、下一页
                 $("#page").empty();
+            })
+        }
+
+        //删除信息
+        function del(id) {
+            $.post("${app}/view/del",{id:id},function () {
+                alert("删除成功~！");
+                myView(1);
             })
         }
 
@@ -462,7 +467,7 @@
                     <span class="caret"></span></a>
                 <ul class="dropdown-menu">
                     <li><a href="#modUserInfo" data-toggle="modal">个人中心</a></li>
-                    <li><a href="javascript:myView(1)">与我相关</a></li>
+                    <li><a href="javascript:myView(1)">我的足迹</a></li>
                 </ul>
             </li>
 
@@ -496,9 +501,10 @@
 
             <ul class="show-nav">
                 <c:if test="${sessionScope.user ne null}">
-                    <span>欢迎:<img width="30px" height="20px" src="${app}/userAvatars/${sessionScope.user.avatar}">&nbsp;&nbsp;${sessionScope.user.username}</span>
+                    欢迎:<img width="30px" height="20px" src="${app}/userAvatars/${sessionScope.user.avatar}">&nbsp;&nbsp;<span id="user">${sessionScope.user.username}</span>
                 </c:if>
                 <c:if test="${sessionScope.user eq null}">
+                    <a class="btn btn-warning" href="${app}/login.jsp">前往登录</a><br>
                     <a class="btn btn-warning" href="${app}/register.jsp">前往注册</a>
                 </c:if>
             </ul>
@@ -676,6 +682,8 @@
     </div>
 </div>
 
-
+<div style="text-align:center;padding-top: 30px">
+    zzu.luoyulong © 2019  3104651846@qq.com
+</div>
 </body>
 </html>

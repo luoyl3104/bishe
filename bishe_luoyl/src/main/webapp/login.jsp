@@ -145,7 +145,7 @@ a{
 <DIV class="top_div">
 </DIV>
 <form action="" method="post" >
-	<DIV style="background: rgb(255, 255, 255); margin: -100px auto auto; border: 1px solid rgb(231, 231, 231); border-image: none; width: 400px; height: 260px; text-align: center;">
+	<DIV style="background: rgb(255, 255, 255); margin: -100px auto auto; border: 1px solid rgb(231, 231, 231); border-image: none; width: 400px; height: 280px; text-align: center;">
 		<DIV style="width: 165px; height: 96px; position: absolute;">
 			<DIV class="tou">
 			</DIV>
@@ -178,7 +178,7 @@ a{
 			<P style="margin: 0px 35px 20px 45px;">
 				<SPAN style="float: left;">您还不是本网站用户？</SPAN>
 				<SPAN style="float: right;">
-					<a href="${app}/province/queryAll" class="btn-primary" style="background: rgb(0, 142, 173); padding: 7px 10px; border-radius: 4px; border: 1px solid rgb(26, 117, 152); border-image: none; color: rgb(255, 255, 255); font-weight: bold;width: 30px">&nbsp;注册&nbsp;</a>
+					<a href="${app}/register.jsp" class="btn-primary" style="background: rgb(0, 142, 173); padding: 7px 10px; border-radius: 4px; border: 1px solid rgb(26, 117, 152); border-image: none; color: rgb(255, 255, 255); font-weight: bold;width: 30px">&nbsp;注册&nbsp;</a>
 				</SPAN>
 			</P>
 

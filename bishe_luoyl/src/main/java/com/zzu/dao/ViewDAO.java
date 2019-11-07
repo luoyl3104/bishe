@@ -16,4 +16,5 @@ public interface ViewDAO extends Mapper<View> {
 
     public void insertView(View view);
 
+
 }

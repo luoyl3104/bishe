@@ -23,8 +23,8 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional(propagation = Propagation.SUPPORTS)
     @Override
-    public List<Comment> findByPage(Integer start, Integer rows) {
-        return commentDAO.selectByPage(start,rows);
+    public List<Comment> findByPage(Comment comment,Integer start, Integer rows) {
+        return commentDAO.selectByPage(comment,start,rows);
     }
 
     @Override
@@ -57,7 +57,7 @@ public class CommentServiceImpl implements CommentService {
         if(user == null){
             map.put("message",false);
         }else {
-            comment.setId(UUID.randomUUID().toString());
+            comment.setId(""+Math.abs(new Random().nextInt()));
             comment.setPublishDate(new Date());
             comment.setSign(1);
             comment.setUser(user);
@@ -65,6 +65,11 @@ public class CommentServiceImpl implements CommentService {
             map.put("message",true);
         }
         return map;
+    }
+
+    @Override
+    public void deleteByViewId(String id) {
+        commentDAO.deleteByViewId(id);
     }
 
 

@@ -1,55 +1,171 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@page contentType="text/html;charset=utf-8" isELIgnored="false"%>
+<%@page pageEncoding="UTF-8" contentType="text/html; UTF-8" isELIgnored="false" %>
 <c:set value="${pageContext.request.contextPath}" var="app"/>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-	<head>
-		<title>注册中心</title>
-		<link href="${pageContext.request.contextPath }/front/css/login.css" rel="stylesheet" type="text/css" />
-		<link href="${pageContext.request.contextPath }/front/css/page_bottom.css" rel="stylesheet" type="text/css" />
-		<script src="${pageContext.request.contextPath }/statics/boot/js/jquery-3.3.1.min.js"></script>
-		<script type="text/javascript">
-			$(function(){
-                //异步提交
-                $("#submit").click(function () {
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>注册中心</title>
+	<style type="text/css">
+		body{padding-top: 30px}
+		#web{margin: 0 auto; width: 400px}
+		.title{font-size: 18px; padding-left: 25px; border-left: solid #999 1px; margin-bottom: 40px}
+		.form_item{width:398px; height: 52px; border:solid #ddd 1px; position: relative;}
+		.form_item label{width:90px; height:52px; line-height: 52px; float: left;padding-left: 20px; font-size: 14px; color: #666}
+		.form_item .code{position: absolute; right: 0; top: 0; text-align: center;}
+		.form_item input{border:0; font-size: 14px; width: 190px; height: 19px; padding-bottom: 11px; padding-left: 20px; padding-top: 16px}
+		.input-tip{color:#c5c5c5; height: 27px; font-size: 12px; padding-top: 5px}
+		.input-tip span{height: 22px; line-height: 22px}
 
-                    var a = 0;
-                    //密码验证
-                    var password=$("#pwd").val();
-                    var password1=/^[A-Za-z0-9]{6,20}/;
-                    if(password.length==0){
-                        $("#error2").html("密码不可以为空");
-                        a++;
-                    }else if(!password1.test(password)){
-                        $("#error2").html("请按要求输入6-20位的密码");
-                        a++;
-                    }else{
-                        $("#error2").html("输入正确");
-                    }
-                    //昵称验证
-                    var name=$("#username").val();
-                    var name1 = /^[a-z0-9\u4e00-\u9fa5]{4,20}/;
-                    if(name.length==0){
-                        $("#error3").html("用户名不可以为空");
-                        a++;
-                    }else if(!name1.test(name)){
-                        $("#error3").html("请按要求输入4~20位的昵称");
-                        a++;
-                    }else{
-                        $("#error3").html("输入正确");
-                    }
-                    //重复密码验证
-                    var repassword = $("#repwd").val();
-                    if(password != repassword){
-                        $("#error4").html("两次密码不一致");
-                        a++;
-                    }else{
-                        $("#error4").html("输入正确");
-                    }
-                    if(a != 0){
-                        return false;
-                    }
+		button, #btn{width:100%; height: 54px; color:#fff; background-color: #e22; border:0; font-size: 16px; font-family: "微软雅黑"}
 
+		a{
+			text-decoration:none;
+		}
+
+
+	</style>
+	<script src="${app}/statics/boot/js/jquery-3.3.1.min.js"></script>
+	<script src="${app}/statics/boot/js/bootstrap.min.js"></script>
+
+	<script type="text/javascript">
+
+		$(function () {
+            $.post("${app}/view/queryAllProvince",function (result) {
+                var provinces = result.provinces;
+                $.each(provinces,function (i, province) {
+                    var option = $("<option value='"+province.id+"'/>").text(province.name);
+                    $("#provinceSel").append(option);
+                })
+            })
+
+            var uname_reg = /^[\u4e00-\u9fa5]{4,20}$|^[\dA-Za-z_\-]{4,20}$/;
+            var uname_ok = false;
+            // 用户名输入框获取焦点
+            $("#uname").focus(function(){
+                $(this).css("outline", "none");
+                $(this).attr("placeholder", "");
+                $(this).parent().css("border-color", "#999");
+                $("#uname_error").css("color", "#c5c5c5");
+                $("#uname_error").html("支持中文, 字母, 数字, \"-\", \"_\", 的组合, 4-20个字符");
+            });
+            $("#uname").blur(function(){
+                if ($(this).val() == "") {
+                    $(this).attr("placeholder", "您的账户名和登录名");
+                    $("#uname_error").html("");
+                    uname_ok = false;
+                } else if ($(this).val().length < 4 || $(this).val().length > 20) {
+                    // 长度不对
+                    $("#uname_error").html("长度只能在4-20个字符之间");
+                    $("#uname_error").css("color", "red");
+                    $(this).parent().css("border-color", "red");
+                    uname_ok = false;
+                } else if (!$(this).val().match(uname_reg)) {
+                    // 有特殊字符
+                    $("#uname_error").html("格式错误, 仅支持中文, 字母, 数字, \"-\", \"_\"的组合");
+                    $("#uname_error").css("color", "red");
+                    $(this).parent().css("border-color", "red");
+                    uname_ok = false;
+                } else {
+                    uname_ok = true;
+                }
+            });
+
+            var pwd_reg = /^(?![A-Z]+$)(?![a-z]+$)(?!\d+$)(?![\W_]+$)\S{6,20}$/;
+            var pwd_ok = false;
+            // 密码输入框获取焦点
+            $("#pwd").focus(function(){
+                $(this).css("outline", "none");
+                $(this).attr("placeholder", "");
+                $(this).parent().css("border-color", "#999");
+                $("#pwd_error").css("color", "#c5c5c5");
+                $("#pwd_error").html("建议使用字母, 数字和符号两种及以上的组合, 6-20个字符");
+            });
+            $("#pwd").blur(function(){
+                if ($(this).val() == "") {
+                    $(this).attr("placeholder", "建议至少使用两种字符组合");
+                    $("#pwd_error").html("");
+                    pwd_ok = false;
+                } else if ($(this).val().length < 6 || $(this).val().length > 20) {
+                    // 长度不对
+                    $("#pwd_error").html("长度只能在6-20个字符之间");
+                    $("#pwd_error").css("color", "red");
+                    $(this).parent().css("border-color", "red");
+                    pwd_ok = false;
+                } else if (!$(this).val().match(pwd_reg)) {
+                    // 不是两种及以上的组合
+                    $("#pwd_error").html("有被盗风险, 建议使用字母, 数字和符号两种及以上组合");
+                    $("#pwd_error").css("color", "red");
+                    $(this).parent().css("border-color", "red");
+                    pwd_ok = false;
+                } else {
+                    pwd_ok = true;
+                }
+            });
+
+            // 再次密码输入框获取焦点
+            var confirm_pwd_ok = false;
+            $("#confirm_pwd").focus(function(){
+                $(this).css("outline", "none");
+                $(this).attr("placeholder", "");
+                $(this).parent().css("border-color", "#999");
+                $("#confirm_pwd_error").css("color", "#c5c5c5");
+                $("#confirm_pwd_error").html("请再次输入密码");
+            });
+            $("#confirm_pwd").blur(function(){
+                if ($(this).val() == "") {
+                    $(this).attr("placeholder", "请再次输入密码");
+                    $("#confirm_pwd_error").html("");
+                    confirm_pwd_ok = false;
+                } else if ($(this).val() != $("#pwd").val()) {
+                    // 再次输入的密码不一致
+                    $("#confirm_pwd_error").html("两次输入的密码不一致");
+                    $("#confirm_pwd_error").css("color", "red");
+                    $(this).parent().css("border-color", "red");
+                    confirm_pwd_ok = false;
+                } else {
+                    confirm_pwd_ok = true;
+                }
+            });
+
+            // 手机号码输入框获取焦点
+            var phone_reg = /^1[3|4|5|7|8]\d{9}$/;
+            var phone_ok = false;
+            $("#phone").focus(function(){
+                $(this).css("outline", "none");
+                $(this).attr("placeholder", "");
+                $(this).parent().css("border-color", "#999");
+                $("#phone_error").css("color", "#c5c5c5");
+                $("#phone_error").html("验证完成后, 可以使用该手机登录和找回密码");
+            });
+            $("#phone").blur(function(){
+                if ($(this).val() == "") {
+                    $(this).attr("placeholder", "建议使用常用手机");
+                    $("#phone_error").html("");
+                    phone_ok = false;
+                } else if ($(this).val().length != 11) {
+                    // 长度不对
+                    $("#phone_error").html("格式有错");
+                    $("#phone_error").css("color", "red");
+                    $(this).parent().css("border-color", "red");
+                    phone_ok = false;
+                } else if (!$(this).val().match(phone_reg)) {
+                    // 输入的不是手机号码
+                    $("#phone_error").html("格式有错");
+                    $("#phone_error").css("color", "red");
+                    $(this).parent().css("border-color", "red");
+                    phone_ok = false;
+                } else {
+                    phone_ok = true;
+                }
+            });
+
+			$("#btn").click(function () {
+
+                if (uname_ok && pwd_ok && confirm_pwd_ok && phone_ok) {
                     var formData = new FormData($("#editForm")[0]);
                     $.ajax({
                         type:"post",
@@ -60,152 +176,115 @@
                         processData : false,  //必须false才会避开jQuery对 formdata 的默认处理
                         contentType : false,
                         success:function (result) {
-                            if(result.success){
-                                alert()
+                            //console.log(result);
+                            if(result.regist == 1){
+                                window.event.returnValue=false;
                                 window.location.href="${app}/register_ok.jsp";
-                            }else {
-                                $("#nameInfo").text("用户名已存在，请重新输入~~");
                             }
-
+                            if(result.regist == 2){
+                                $("#uname_error").css("color","red").text("用户名已存在，请重新输入~~");
+                            }
                         }
                     })
-                });
+                }else {
+                    alert('信息输入不完整, 请核对');
+                    return false;
+                }
 
-			    
-			});
+            })
 
-		</script>
-	</head>
-	<body>
 
-		<div class="login_step">
+        });
 
+
+
+
+
+
+	</script>
+
+</head>
+<body>
+
+
+<body>
+<div id="web">
+	<form action="" method="post" enctype="multipart/form-data" id="editForm">
+		<div class="form_item">
+			<label>&nbsp;用  户  名&nbsp;</label>
+			<input type="text" value="" placeholder="您的账户名和登录名" id="uname" name="username" />
 		</div>
-		<div class="fill_message" style="color:blue;">
-			<form id="editForm" name="ctl00" enctype="multipart/form-data" method="post">
-				<h2>
-					请填写您的个人信息&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				</h2>
-				<table class="tab_login" >
-					<tr>
-						<td valign="top" class="w1">
-							设置您的用户名：
-						</td>
-						<td>
-							<input name="username"  type="text" id="username" class="text_input" />
-							<div class="text_left" id="nickNameValidMsg">
-								<p>
-									您的用户名可以由小写英文字母、中文、数字组成，
-								</p>
-								<p>
-									长度4－20个字符，一个汉字为两个字符。
-								</p>
-								<div id="error3" style="display:inline;color:red;"></div>
-								<span id="nameInfo" style="color: red"></span>
-							</div>
-						</td>
-					</tr>
-					<tr>
-						<td valign="top" class="w1">
-							设置您的头像：
-						</td>
-						<td>
-							&nbsp;&nbsp;<input name="aaa" type="file" id="aa"/>
-						</td>
-					</tr>
-					<tr>
-						<td valign="top" class="w1">
-							设置您的密码：
-						</td>
-						<td>
-							<input name="password" type="password" id="pwd" class="text_input" />
-							<div class="text_left" id="passwordValidMsg">
-								<p>
-									您的密码可以由大小写英文字母、数字组成，长度6－20位。
-								</p>
-								 <div id="error2" style="display:inline;color:red;"></div>
-								<span id="passwordInfo"></span>
-							</div>
-						</td>
-					</tr>
-					<tr>
-						<td valign="top" class="w1">
-							再次输入您设置的密码：
-						</td>
-						<td>
-							<input name="password1" type="password" id="repwd" class="text_input"/>
-							<div class="text_left" id="repeatPassValidMsg">
-								<div id="error4" style="display:inline;color:red;"></div>
-								<span id="password1Info"></span>
-							</div>
-							
-						</td>
-					</tr>
-					<tr>
-						<td valign="top" class="w1">
-							选择您的性别：
-						</td>
-						<td>
-							&nbsp;
-							<select name="sex" style="width: 100px;height: 25px;">
-								<option value="男">男</option>
-								<option value="女">女</option>
-							</select>
-
-						</td>
-					</tr>
-					<tr>
-						<td valign="top" class="w1">
-							选择您的所在地：
-						</td>
-						<td>
-							&nbsp;
-							<select name="province.id" style="width: 100px;height: 25px;">
-								<c:forEach items="${requestScope.provinces}" var="pro">
-									<option value="${pro.id}">${pro.name}</option>
-								</c:forEach>
-							</select>
-
-						</td>
-					</tr>
-					<tr>
-						<td valign="top" class="w1">
-							请输入您的手机号：
-						</td>
-						<td>
-							<input name="phone" type="text" id="phone" class="text_input"/>
-							<div class="text_left" id="phoneMsg">
-							<p>
-								请输入有效的手机号，以方便我们将来联系您。
-							</p>
-
-								<div id="error5" style="display:inline;color:red;"></div>
-								<span id="msg"></span>
-							</div>
-						</td>
-					</tr>
-					<tr>
-						<td valign="top" class="w1">
-							请填写您的Email地址：
-						</td>
-						<td>
-							<input name="email"  type="text" id="email" class="text_input"/>
-							<div class="text_left" id="emailValidMsg">
-								<p>
-									请填写有效的Email地址。
-								</p>
-								<div id="error1" style="display:inline;color:red;"></div>
-								<span id="emailInfo"></span>
-							</div>
-						</td>
-					</tr>
-				</table>
-				<div class="login_in">
-					<button id="submit" class="btn-default">&nbsp;&nbsp;&nbsp;&nbsp;注&nbsp;册&nbsp;&nbsp;&nbsp;&nbsp;</button>
-				</div>
-			</form>
+		<div class="input-tip">
+			<span id="uname_error"></span>
 		</div>
 
-	</body>
+		<div class="form_item">
+			<label>设 置 头 像</label>
+			<input type="file" value="" id="avatar" name="aaa" />
+		</div>
+		<div class="input-tip">
+			<span ></span>
+		</div>
+		<div class="form_item">
+			<label>设 置 密 码</label>
+			<input type="password" value="" placeholder="建议至少使用两种字符组合" id="pwd" name="password" />
+		</div>
+		<div class="input-tip">
+			<span id="pwd_error"></span>
+		</div>
+		<div class="form_item">
+			<label>确 认 密 码</label>
+			<input type="password" value="" placeholder="请再次输入密码" id="confirm_pwd" />
+		</div>
+		<div class="input-tip">
+			<span id="confirm_pwd_error"></span>
+		</div>
+		<div class="form_item">
+			<label>设 置 性 别</label>
+			<input name="sex" type="radio" checked value="男"/>男
+			<input name="sex" type="radio" value="女"/>女
+		</div>
+		<div class="input-tip">
+			<span id="sex_error"></span>
+		</div>
+		<div class="form_item">
+			<label>设置所在地</label>
+			<div style="margin:auto;width: 200px;margin-top:3.5%;">
+				<select style="width: 150px;height: 20px" name="province.id" id="provinceSel">
+
+				</select>
+			</div>
+		</div>
+		<div class="input-tip">
+			<span id="prc_error"></span>
+		</div>
+		<div class="form_item">
+			<label>中国 + 86</label>
+			<input type="text" value="" placeholder="请输入正确格式手机号" id="phone" name="phone" />
+		</div>
+		<div class="input-tip">
+			<span id="phone_error"></span>
+		</div>
+		<div class="form_item">
+			<label> 邮&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;箱 </label>
+			<input type="text" value="" placeholder="请输入常用邮箱" id="email" name="email"/>
+			<label class="code"></label>
+		</div>
+		<div class="input-tip">
+			<span id="code_error"></span>
+		</div>
+
+		<a><button type="button" id="btn">立即注册</button></a>
+
+		<div class="input-tip">
+			<span></span>
+		</div>
+	</form>
+</div>
+</body>
+
+
+
+
+</body>
 </html>
-

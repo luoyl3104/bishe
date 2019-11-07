@@ -4,7 +4,7 @@
 
     <!-- 查询 -->
     <select id="login" resultType="admin" parameterType="String">
-        select id,name,password from admin where name=#{name}
+        select id,name,password,type from admin where name=#{name}
     </select>
 
 </mapper>

@@ -14,11 +14,11 @@
     <script src="./statics/jqgrid/js/trirand/i18n/grid.locale-cn.js"></script>
     <script>
 
-        $(function () {
-            $(window).resize(function () {
-                $("#picTable").setGridWidth($("#centerLayout").width());
-            });
-        });
+        function exit() {
+            $.post("${app}/admin/exit",function () {
+                location.href="${app}/adminLogin.jsp";
+            })
+        }
 
     </script>
 
@@ -44,7 +44,7 @@
         <!--生成导航内容-->
         <ul class="nav navbar-nav navbar-right">
             <li><a href="">您好:<span class="text-primary" style="color: #2aabd2">${sessionScope.admin.name}</span></a></li>
-            <li><a href="${app}/admin/exit">退出登录<span class="glyphicon glyphicon-log-out" aria-hidden="true"></span></a></li>
+            <li><a href="javascript:exit()">退出登录<span class="glyphicon glyphicon-log-out" aria-hidden="true"></span></a></li>
         </ul>
     </div>
 </nav>
@@ -126,8 +126,8 @@
 </div>
 
 <!--底部-->
-<div class="col-sm-5 col-sm-offset-4 ">
-    <p class="center-block" style="font-size: 16px;text-align: center">zzu.luoyl@3104651846@qq.com</p>
+<div style="text-align:center;padding-top: 30px">
+    zzu.luoyulong © 2019  3104651846@qq.com
 </div>
 
 

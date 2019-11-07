@@ -14,6 +14,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,6 +38,7 @@ public class UserController {
     @Autowired
     private ProvinceService provinceService;
 
+
     //修改个人信息
     @RequestMapping("update")
     public Map<String,Object> editUser(User user){
@@ -49,7 +51,7 @@ public class UserController {
     public Map<String,Object> queryOne(HttpSession session){
         Map<String,Object> map = new HashMap<>();
         User user = (User) session.getAttribute("user");
-        System.out.println(user);
+        //System.out.println(user);
         if(user == null){
             map.put("message",false);
         }else {
@@ -79,7 +81,7 @@ public class UserController {
     public Map<String,Object> register(MultipartFile aaa ,User user,HttpServletRequest request) throws IOException {
         Map<String,Object> map = new HashMap<>();
         User user1 = userService.findByUsername(user.getUsername());
-        //System.out.println("---------------"+user.getProvince().getId());
+        System.out.println("================="+user);
         if(user1 == null){
             //上传头像
             String realPath = request.getSession().getServletContext().getRealPath("/userAvatars");
@@ -94,35 +96,42 @@ public class UserController {
             aaa.transferTo(new File(realPath,newFilename));
             user.setAvatar(newFilename);
             userService.register(user);
-            map.put("success",true);
+            map.put("regist",1);
         }else {
-            map.put("success",false);
+            map.put("regist",2);
         }
         return map;
     }
 
+
+
     //修改用户状态
     @RequestMapping("updateType")
     public void updateType(User user){
-        if(user.getType().equals("激活")){
-            user.setType("冻结");
+        User byId = userService.findById(user.getId());
+        System.out.println("========="+user);
+        if(byId.getType().equals("激活")){
+            byId.setType("冻结");
         }else {
-            user.setType("激活");
+            byId.setType("激活");
         }
-        userService.updateType(user);
+        userService.updateType(byId);
     }
 
     @RequestMapping("queryByPage")
-    public Map<String,Object> queryByPage(Integer page,Integer rows){
+    public Map<String,Object> queryByPage(User user,Integer page){
+        //System.out.println("============"+user);
         HashMap<String, Object> map = new HashMap<>();
+        Integer rows = 10;
+        page = page == null?1:page;
         Integer start = (page-1)*rows;
-        List<User> users = userService.findByPage(start, rows);
+        List<User> users = userService.findByPage(user,start, rows);
         Long totals = userService.findTotals();
         Long pageTotal = totals%rows==0?totals/rows:totals/rows+1;
         map.put("page",page);
-        map.put("total",pageTotal);
-        map.put("records",totals);
-        map.put("rows",users);
+        map.put("pageTotal",pageTotal);
+        map.put("totals",totals);
+        map.put("users",users);
         return map;
     }
 
@@ -134,7 +143,6 @@ public class UserController {
         HSSFSheet user = workbook.createSheet("user");
         //行 参数：下标
         HSSFRow row = user.createRow(0);
-
         //表头
         String[] strs = {"id","username","password","sex","phone","email","type","registDate"};
         for (int i = 0;i<strs.length;i++){
@@ -152,11 +160,11 @@ public class UserController {
             row1.createCell(1).setCellValue(users.get(i).getUsername());
             row1.createCell(2).setCellValue(users.get(i).getPassword());
             row1.createCell(3).setCellValue(users.get(i).getSex());
-            row1.createCell(5).setCellValue(users.get(i).getPhone());
-            row1.createCell(6).setCellValue(users.get(i).getEmail());
-            row1.createCell(7).setCellValue(users.get(i).getType());
+            row1.createCell(4).setCellValue(users.get(i).getPhone());
+            row1.createCell(5).setCellValue(users.get(i).getEmail());
+            row1.createCell(6).setCellValue(users.get(i).getType());
             String format = sdf.format(users.get(i).getRegistDate());
-            row1.createCell(8).setCellValue(format);
+            row1.createCell(7).setCellValue(format);
         }
         //设置表名
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");

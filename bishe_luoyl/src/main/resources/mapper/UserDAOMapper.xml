@@ -22,7 +22,16 @@
     <!-- 查询 -->
     <select id="selectByPage" resultMap="userMap">
         select u.id,u.username,u.password,u.type,u.sex,u.avatar,u.phone,u.email,u.regist_date,p.id as pid,p.name
-            from (select * from user limit #{start},#{rows}) u
+            from (select * from user
+                    <where>
+                        <if test="user.username != null and user.username != ''">
+                            username like concat(concat("%",#{user.username}),"%")
+                        </if>
+                        <if test="user.type != null and user.type != ''">
+                            and type = #{user.type}
+                        </if>
+                    </where>
+                limit #{start},#{rows}) u
             left join province p on u.province_id=p.id
     </select>
 
@@ -32,9 +41,15 @@
             where u.username=#{username}
     </select>
 
+    <select id="selectById" resultMap="userMap" parameterType="String">
+        select u.id,u.username,u.password,u.type,u.sex,u.avatar,u.phone,u.email,u.regist_date,p.id as pid,p.name
+            from user u left join province p on u.province_id=p.id
+            where u.id=#{id}
+    </select>
+
     <!--注册-->
     <insert id="insertUser" parameterType="User">
-        insert into user values(#{id},#{username},${password},#{sex},#{type},#{avatar},#{phone},#{email},#{registDate},#{province.id})
+        insert into user values(#{id},#{username},#{password},#{sex},#{type},#{avatar},#{phone},#{email},#{registDate},#{province.id})
     </insert>
 
     <!--修改-->

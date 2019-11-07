@@ -33,6 +33,13 @@ public class ViewController {
     @Autowired
     private ProvinceService provinceService;
 
+    //删除信息
+    @RequestMapping("del")
+    public void remove(String id){
+        viewService.removeView(id);
+        commentService.deleteByViewId(id);
+    }
+
     //查询地址
     @RequestMapping("queryAllProvince")
     public Map<String,Object> queryAllProvince(){
@@ -116,18 +123,20 @@ public class ViewController {
 
     //用于后台管理
     @RequestMapping("queryView")
-    public Map<String,Object> queryByPage(Integer page,Integer rows){
+    public Map<String,Object> queryByPage(View view,Integer page,String provinceId){
         HashMap<String, Object> map = new HashMap<>();
         Long totals = viewService.findTotals();
+        Integer rows = 10;
+        page = page == null?1:page;
         Integer start = (page - 1)*rows;
-        View view = new View();
         Province province = new Province();
+        province.setId(provinceId);
         view.setProvince(province);
         List<View> views = viewService.findByPage(start, rows,view);
         Long pageTotal = totals%rows==0?totals/rows:totals/rows+1;
-        map.put("rows",views);
-        map.put("records",totals);
-        map.put("total",pageTotal);
+        map.put("views",views);
+        map.put("totals",totals);
+        map.put("pageTotal",pageTotal);
         map.put("page",page);
         return map;
     }
@@ -173,7 +182,9 @@ public class ViewController {
 
     //管理员修改状态
     @RequestMapping("updateType")
-    public void updateType(View view){
+    public void updateType(String id){
+        //System.out.println("=============="+id);
+        View view = viewService.findOne(id);
         if(view.getType().equals("开放")){
             view.setType("关闭");
         }else {

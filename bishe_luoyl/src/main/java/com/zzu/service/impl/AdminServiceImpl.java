@@ -31,9 +31,14 @@ public class AdminServiceImpl implements AdminService {
             map.put("message",message);
         }else {
             if(login.getPassword().equals(admin.getPassword())){
-                HttpSession session = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getSession();
-                session.setAttribute("admin",login);
-                map.put("message","success");
+                if (login.getType().equals(1)){
+                    HttpSession session = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getSession();
+                    session.setAttribute("admin",login);
+                    map.put("message","success");
+                }else {
+                    map.put("message","该管理员已被冻结，请联系数据库管理员重新获取登录名和密码~~");
+                }
+
             }else {
                 message = "您输入的密码有误~！";
                 map.put("message",message);

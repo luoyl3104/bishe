@@ -13,12 +13,12 @@ spring:
     username: root
     password: root
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://localhost:3306/bishe
+    url: jdbc:mysql://192.168.248.134:3306/bishe
     driver-class-name: com.mysql.jdbc.Driver
   http:
-    multipart:
-      max-file-size: 209715200
-      max-request-size: 209715200
+      multipart:
+        max-file-size: 209715200  #用来指定服务端最大文件大小
+        max-request-size: 209715200 #用来控制文件上传大小的限制
 mybatis:
   type-aliases-package: com.zzu.entity
   mapper-locations: classpath:mapper/*.xml

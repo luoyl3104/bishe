@@ -8,7 +8,7 @@ import java.util.Map;
 
 public interface UserService {
 
-    public List<User> findByPage(Integer start,Integer rows);
+    public List<User> findByPage(User user,Integer start,Integer rows);
 
     public Long findTotals();
 
@@ -21,6 +21,8 @@ public interface UserService {
     public void register(User user);
 
     public User findOne(User user);
+
+    public User findById(String id);
 
     public User findByUsername(String username);
 

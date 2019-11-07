@@ -8,9 +8,11 @@ import java.util.List;
 
 public interface UserDAO extends Mapper<User> {
 
-    public List<User> selectByPage(@Param("start") Integer start, @Param("rows") Integer rows);
+    public List<User> selectByPage(@Param("user")User user,@Param("start") Integer start, @Param("rows") Integer rows);
 
     public User selectByUsername(String username);
+
+    public User selectById(String id);
 
     //注册
     public void insertUser(User user);

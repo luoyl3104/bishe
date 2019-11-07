@@ -17,6 +17,9 @@
         </association>
     </resultMap>
 
+    <delete id="deleteByViewId" parameterType="String">
+        delete from comment where view_id=#{id}
+    </delete>
 
     <insert id="insertComment" parameterType="Comment">
         insert into comment values(#{id},#{content},#{sign},#{publishDate},#{user.id},#{view.id})
@@ -26,7 +29,13 @@
     <!-- 查询 -->
     <select id="selectByPage" resultMap="commentMap">
         select c.id,c.content,c.sign,c.publish_date,u.id as uid,u.username,v.id as vid,v.name
-          from (select * from comment limit #{start},#{rows}) c
+          from (select * from comment
+                    <where>
+                        <if test="comment.content != null and comment.content != ''">
+                            content like concat(concat("%",#{comment.content}),"%")
+                        </if>
+                    </where>
+                limit #{start},#{rows}) c
           left join user u on c.user_id=u.id left join view v on c.view_id=v.id
           order by c.publish_date desc
     </select>

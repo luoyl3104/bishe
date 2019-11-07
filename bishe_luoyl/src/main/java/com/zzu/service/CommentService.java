@@ -8,7 +8,7 @@ import java.util.Map;
 public interface CommentService {
 
 
-    public List<Comment> findByPage(Integer start,Integer rows);
+    public List<Comment> findByPage(Comment comment,Integer start,Integer rows);
 
     public Long findTotal();
 
@@ -19,5 +19,7 @@ public interface CommentService {
     public List<Comment> findByViewId(String viewId);
 
     public Map<String,Object> addComment(Comment comment);
+
+    public void deleteByViewId(String id);
 
 }

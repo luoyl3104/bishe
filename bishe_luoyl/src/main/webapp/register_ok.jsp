@@ -2,7 +2,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
-		<title>用户注册 - 当当网</title>
+		<title></title>
 		<link href="${pageContext.request.contextPath }/front/css/login.css" rel="stylesheet" type="text/css" />
 		<link href="${pageContext.request.contextPath }/front/css/page_bottom.css" rel="stylesheet" type="text/css" />
 		<script src="${pageContext.request.contextPath }/statics/boot/js/jquery-3.3.1.min.js"></script>
@@ -45,7 +45,9 @@
 				</script>
 			</div>
 		</div>
-
+		<div style="text-align:center;padding-top: 30px">
+			zzu.luoyulong © 2019  3104651846@qq.com
+		</div>
 	</body>
 </html>
 
