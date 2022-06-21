@@ -48,7 +48,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.38</version>
+            <version>8.0.28</version>
         </dependency>
         <!-- jsp解析jar包 -->
         <dependency>
@@ -128,7 +128,7 @@
                     <dependency>
                         <groupId>mysql</groupId>
                         <artifactId>mysql-connector-java</artifactId>
-                        <version>5.1.38</version>
+                        <version>8.0.28</version>
                     </dependency>
                 </dependencies>
                 <configuration>
